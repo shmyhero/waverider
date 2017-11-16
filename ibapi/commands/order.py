@@ -29,7 +29,8 @@ def create_contract(symbol, sec_type, exch, prim_exch, curr):
     contract.m_currency = curr
     return contract
 
-def create_order(order_type, quantity, action):
+
+def create_order(order_type, quantity, action, lmt_price = None):
     """Create an Order object (Market/Limit) to go long/short.
 
     order_type - 'MKT', 'LMT' for Market or Limit orders
@@ -39,10 +40,12 @@ def create_order(order_type, quantity, action):
     order.m_orderType = order_type
     order.m_totalQuantity = quantity
     order.m_action = action
+    if lmt_price is not None:
+        order.m_lmtPrice = lmt_price
     return order
 
 
-def main(order_id, symbol, sec_type, order_type, quantity, action):
+def main(order_id, symbol, sec_type, order_type, quantity, action, lmt_price = None):
 
     # Connect to the Trader Workstation (TWS) running on the
     # usual port of 7496, with a clientId of 100
@@ -63,7 +66,7 @@ def main(order_id, symbol, sec_type, order_type, quantity, action):
     contract = create_contract(symbol, sec_type, 'SMART', 'SMART', 'USD')
 
     # Go long 100 shares of Google
-    order = create_order(order_type, quantity, action)
+    order = create_order(order_type, quantity, action, lmt_price)
 
     # Use the connection to the send the order to IB
     tws_conn.placeOrder(order_id, contract, order)
@@ -79,5 +82,12 @@ if __name__ == "__main__":
     order_type = sys.argv[4]
     quantity = int(sys.argv[5])
     action = sys.argv[6]
-    main(order_id, symbol, sec_type, order_type, quantity, action)
+    lmt_price = None
+    if len(sys.argv) > 7 and sys.argv[7] != '':
+        try:
+            lmt_price = float(sys.argv[7])
+        except Exception:
+            pass
+
+    main(order_id, symbol, sec_type, order_type, quantity, action, lmt_price)
 
