@@ -33,16 +33,17 @@ class API(object):
     @staticmethod
     def parse_order(content):
         symbol = string_fetch(content, 'm_symbol\': \'', '\'')
+        order_id = string_fetch(content, 'orderId=', ',')
         action = string_fetch(content, 'm_action\': \'', '\'')
         quantity = string_fetch(content, 'm_totalQuantity\': ', ',')
         #lmt_price = string_fetch(content, 'm_lmtPrice\': \'', '\'')
-        return [symbol, action, quantity]
+        return [symbol, order_id, action, quantity]
 
     @staticmethod
     def get_order_id():
         order_file_path = PathMgr.get_data_file_path('orderid.txt')
         order_id = int(read_file_to_string(order_file_path))
-        write_to_file(order_file_path, str(order_id % 65536 + 1))
+        write_to_file(order_file_path, str(order_id + 1))
         return order_id
 
     def get_portfolio_info(self):
@@ -58,7 +59,7 @@ class API(object):
 
     def get_open_orders(self):
         output = self.run_cmd('get_open_orders')
-        #print output
+        # print output
         items = output.split('<openOrder ')
         if len(items) > 0:
             orders = map(API.parse_order, items[1:])
@@ -71,6 +72,7 @@ class API(object):
         if lmt_price is not None:
             arguments.append(lmt_price)
         output = self.run_cmd('order', arguments)
+        print output
         return output
 
     def get_market_price(self, symbol, sec_type = 'STK', exchange = 'SMART', currency = 'USD', strike = 0.0, expiry = '', action = ''):
@@ -105,19 +107,21 @@ def order_target_percent(asset, percent, style='MKT', sec_type = 'STK'):
         raise Exception('The cost of asset exceed total cash...')
 
 
-def get_open_orders(asset):
+def get_open_orders(asset=None):
     orders = API().get_open_orders()
-    #TODO: filter the orders by asset
-    return orders
+    if asset:
+        return filter(lambda x:x[0] == asset, orders)
+    else:
+        return orders
 
 
 if __name__ == '__main__':
-    print API().get_portfolio_info()
+    #print API().get_portfolio_info()
     #print API.get_order_id()
     #print API().get_market_price('SPY')
     #print API().get_market_price('SPY', 'OPT', strike=255.0, expiry='20171215', action='CALL')
-    #print API().get_open_orders()
-    #order_target('SPY', 10)
-    #order_target_percent('XIV', 0.1)
-    #order_target('VIX', -50, 'LMT', lmt_price = 105)
+    print get_open_orders()
+    #order_target('UVXY', 10)
+    #order_target_percent('UVXY', 0.01)
+    #order_target('SPY', 20, 'LMT', lmt_price = 256)
 
