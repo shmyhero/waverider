@@ -84,6 +84,15 @@ class API(object):
         else:
             raise Exception('Unable to get market price...')
 
+    def cancel_order(self, order_id):
+        output = self.run_cmd('cancel_order', [order_id])
+        msg = 'OrderId %s that needs to be cancelled is not found' % order_id
+        if msg in output:
+            self.logger.error(msg)
+            raise Exception(msg)
+        else:
+            self.logger.info('OrderId %s cancelled'%order_id)
+
 
 class OrderStyle(object):
 
@@ -132,6 +141,10 @@ def get_open_orders(asset=None):
         return orders
 
 
+def cancel_order(order_id):
+    API().cancel_order(order_id)
+
+
 if __name__ == '__main__':
     #print API().get_portfolio_info()
     #print API.get_order_id()
@@ -144,4 +157,5 @@ if __name__ == '__main__':
     #order_target_percent('AAPL', 0.01)
     #order_target('QQQ', 30, style=OrderStyle.MarketOrder)
     #order_target('SPY', 12, style=OrderStyle.StopOrder(249.0))
+    #cancel_order(100013)
 

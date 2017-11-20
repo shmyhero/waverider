@@ -3,9 +3,11 @@ from ib.ext.Contract import Contract
 from ib.ext.Order import Order
 from ib.opt import Connection, message
 
+
 def error_handler(msg):
     """Handles the capturing of error messages"""
     print "Server Error: %s" % msg
+
 
 def reply_handler(msg):
     """Handles of server replies"""
