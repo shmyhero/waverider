@@ -58,4 +58,5 @@ def main():
 
 if __name__ == '__main__':
     # sys.argv = ['', 'SPY', 'STK', 'SMART', 'USD', 0.0, '', '']
+    # sys.argv = ['', 'SPY', 'OPT', 'SMART', 'USD', 258.0, '20171215', 'CALL']
     main()

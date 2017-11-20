@@ -67,10 +67,10 @@ class API(object):
             orders = []
         return orders
 
-    def order(self, symbol, sec_type, order_type, quantity, action, lmt_price=None):
+    def order(self, symbol, sec_type, order_type, quantity, action, price=None):
         arguments = [API.get_order_id(), symbol, sec_type, order_type, quantity, action]
-        if lmt_price is not None:
-            arguments.append(lmt_price)
+        if price is not None:
+            arguments.append(price)
         output = self.run_cmd('order', arguments)
         print output
         return output
@@ -85,14 +85,31 @@ class API(object):
             raise Exception('Unable to get market price...')
 
 
-def order_target(asset, amount, style='MKT', sec_type='STK', lmt_price = None):
+class OrderStyle(object):
+
+    def __init__(self):
+        pass
+
+    MarketOrder = ['MKT', None]
+
+    @staticmethod
+    def StopOrder(stop_price):
+        return ['STP', stop_price]
+
+    @staticmethod
+    def LimitOrder(lmt_price):
+        return ['LMT', lmt_price]
+
+
+def order_target(asset, amount, style=OrderStyle.MarketOrder, sec_type='STK'):
+    [order_type, price] = style
     if amount > 0:
-        API().order(asset, sec_type, style, amount, 'BUY', lmt_price= lmt_price)
+        API().order(asset, sec_type, order_type, amount, 'BUY', price)
     else:
-        API().order(asset, sec_type, style, -amount, 'SELL', lmt_price= lmt_price)
+        API().order(asset, sec_type, order_type, -amount, 'SELL', price)
 
 
-def order_target_percent(asset, percent, style='MKT', sec_type = 'STK'):
+def order_target_percent(asset, percent, style=OrderStyle.MarketOrder, sec_type = 'STK'):
     portfolio = API().get_portfolio_info()
     current_percent = portfolio.get_percentage(asset)
     order_cash = (percent - current_percent) * portfolio.net_liquidation
@@ -100,7 +117,7 @@ def order_target_percent(asset, percent, style='MKT', sec_type = 'STK'):
         market_price = API().get_market_price(asset)
         amount = int(order_cash/market_price)
         if portfolio.get_quantity(asset) + amount > 0:
-            order_target(asset, amount)
+            order_target(asset, amount, style)
         else:
             raise Exception('The quantity of asset exceed existing quantity in repository...')
     else:
@@ -118,10 +135,13 @@ def get_open_orders(asset=None):
 if __name__ == '__main__':
     #print API().get_portfolio_info()
     #print API.get_order_id()
-    #print API().get_market_price('SPY')
-    #print API().get_market_price('SPY', 'OPT', strike=255.0, expiry='20171215', action='CALL')
+    #print API().get_market_price('GOOG')
+    #print API().get_market_price('SPY', 'OPT', strike=258, expiry='20171215', action='CALL')
+
+    # API related functions below:
     print get_open_orders()
-    #order_target('UVXY', 10)
-    #order_target_percent('UVXY', 0.01)
-    #order_target('SPY', 20, 'LMT', lmt_price = 256)
+    #order_target('SPY', 10)
+    #order_target_percent('AAPL', 0.01)
+    #order_target('QQQ', 30, style=OrderStyle.MarketOrder)
+    #order_target('SPY', 12, style=OrderStyle.StopOrder(249.0))
 
