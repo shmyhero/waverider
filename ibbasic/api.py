@@ -4,7 +4,7 @@ from utils.shell import Shell
 from utils.stringhelper import string_fetch
 from common.pathmgr import PathMgr
 from utils.listhelper import list_to_hash
-from ibapi.portfolio import Portfolio
+from ibbasic.portfolio import Portfolio
 
 
 class API(object):
@@ -36,8 +36,8 @@ class API(object):
         order_id = string_fetch(content, 'orderId=', ',')
         action = string_fetch(content, 'm_action\': \'', '\'')
         quantity = string_fetch(content, 'm_totalQuantity\': ', ',')
-        #lmt_price = string_fetch(content, 'm_lmtPrice\': \'', '\'')
-        return [symbol, order_id, action, quantity]
+        # lmt_price = string_fetch(content, 'm_lmtPrice\': \'', '\'')
+        return [order_id, symbol, action, quantity]
 
     @staticmethod
     def get_order_id():
@@ -45,6 +45,18 @@ class API(object):
         order_id = int(read_file_to_string(order_file_path))
         write_to_file(order_file_path, str(order_id + 1))
         return order_id
+
+    @staticmethod
+    def validate_order_output(output):
+        server_error_msg = 'Server Error:'
+        if server_error_msg in output:
+            items = output.split(server_error_msg)[1:]
+            error_items = map(lambda x: [string_fetch(x, 'errorCode=', ','), string_fetch(x, 'errorMsg=', '>')], items)
+            ignore_error_codes = ['2104', '2016']
+            filtered_error_items = filter(lambda x: x[0] not in ignore_error_codes, error_items)
+            if len(filtered_error_items) > 0:
+                exception_msg = str(map(lambda x: 'errorCode={}, errorMsg={}'.format(x[0], x[1]), filtered_error_items))
+                raise Exception(exception_msg)
 
     def get_portfolio_info(self):
         output = self.run_cmd('account')
@@ -68,12 +80,13 @@ class API(object):
         return orders
 
     def order(self, symbol, sec_type, order_type, quantity, action, price=None):
-        arguments = [API.get_order_id(), symbol, sec_type, order_type, quantity, action]
+        order_id = API.get_order_id()
+        arguments = [order_id, symbol, sec_type, order_type, quantity, action]
         if price is not None:
             arguments.append(price)
         output = self.run_cmd('order', arguments)
-        print output
-        return output
+        API.validate_order_output(output)
+        return order_id
 
     def get_market_price(self, symbol, sec_type = 'STK', exchange = 'SMART', currency = 'USD', strike = 0.0, expiry = '', action = ''):
         output = self.run_cmd('market', [symbol, sec_type, exchange, currency, strike, expiry, action])
@@ -93,69 +106,10 @@ class API(object):
         else:
             self.logger.info('OrderId %s cancelled'%order_id)
 
-
-class OrderStyle(object):
-
-    def __init__(self):
-        pass
-
-    MarketOrder = ['MKT', None]
-
-    @staticmethod
-    def StopOrder(stop_price):
-        return ['STP', stop_price]
-
-    @staticmethod
-    def LimitOrder(lmt_price):
-        return ['LMT', lmt_price]
-
-
-def order_target(asset, amount, style=OrderStyle.MarketOrder, sec_type='STK'):
-    [order_type, price] = style
-    if amount > 0:
-        API().order(asset, sec_type, order_type, amount, 'BUY', price)
-    else:
-        API().order(asset, sec_type, order_type, -amount, 'SELL', price)
-
-
-def order_target_percent(asset, percent, style=OrderStyle.MarketOrder, sec_type = 'STK'):
-    portfolio = API().get_portfolio_info()
-    current_percent = portfolio.get_percentage(asset)
-    order_cash = (percent - current_percent) * portfolio.net_liquidation
-    if order_cash < portfolio.total_cash:
-        market_price = API().get_market_price(asset)
-        amount = int(order_cash/market_price)
-        if portfolio.get_quantity(asset) + amount > 0:
-            order_target(asset, amount, style)
-        else:
-            raise Exception('The quantity of asset exceed existing quantity in repository...')
-    else:
-        raise Exception('The cost of asset exceed total cash...')
-
-
-def get_open_orders(asset=None):
-    orders = API().get_open_orders()
-    if asset:
-        return filter(lambda x:x[0] == asset, orders)
-    else:
-        return orders
-
-
-def cancel_order(order_id):
-    API().cancel_order(order_id)
-
-
 if __name__ == '__main__':
-    #print API().get_portfolio_info()
+    print API().get_portfolio_info()
     #print API.get_order_id()
     #print API().get_market_price('GOOG')
     #print API().get_market_price('SPY', 'OPT', strike=258, expiry='20171215', action='CALL')
 
-    # API related functions below:
-    print get_open_orders()
-    #order_target('SPY', 10)
-    #order_target_percent('AAPL', 0.01)
-    #order_target('QQQ', 30, style=OrderStyle.MarketOrder)
-    #order_target('SPY', 12, style=OrderStyle.StopOrder(249.0))
-    #cancel_order(100013)
 

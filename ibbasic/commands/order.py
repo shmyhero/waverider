@@ -1,7 +1,8 @@
 import sys
 from ib.ext.Contract import Contract
 from ib.ext.Order import Order
-from ib.opt import Connection, message
+from ib.opt import Connection
+from common.configmgr import ConfigMgr
 
 
 def error_handler(msg):
@@ -56,7 +57,7 @@ def main(order_id, symbol, sec_type, order_type, quantity, action, price = None)
     # (The clientId is chosen by us and we will need
     # separate IDs for both the execution connection and
     # market data connection)
-    tws_conn = Connection.create(port=7496, clientId=100)
+    tws_conn = Connection.create(port=7496, clientId=int(ConfigMgr.get_ib_config()['order_client_id']))
     tws_conn.connect()
 
     # Assign the error handling function defined above
@@ -92,6 +93,5 @@ if __name__ == "__main__":
             price = float(sys.argv[7])
         except Exception:
             pass
-
     main(order_id, symbol, sec_type, order_type, quantity, action, price)
 

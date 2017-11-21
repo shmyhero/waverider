@@ -1,7 +1,7 @@
 import sys
 import time
-from ib.opt import Connection, message
-
+from ib.opt import Connection
+from common.configmgr import ConfigMgr
 
 def error_handler(msg):
     """Handles the capturing of error messages"""
@@ -20,7 +20,7 @@ def main(order_id):
     # (The clientId is chosen by us and we will need
     # separate IDs for both the execution connection and
     # market data connection)
-    tws_conn = Connection.create(port=7496, clientId=100)
+    tws_conn = Connection.create(port=7496, clientId=int(ConfigMgr.get_ib_config()['order_client_id']))
     tws_conn.connect()
 
     # Assign the error handling function defined above
@@ -33,7 +33,7 @@ def main(order_id):
 
     tws_conn.cancelOrder(order_id)
 
-    time.sleep(3)
+    time.sleep(2)
 
     # Disconnect from TWS
     tws_conn.disconnect()
@@ -41,6 +41,6 @@ def main(order_id):
 
 if __name__ == "__main__":
     # sys.argv = ['', '100014']
-    order_id = int(int(sys.argv[1]))
+    order_id = int(sys.argv[1])
     main(order_id)
 

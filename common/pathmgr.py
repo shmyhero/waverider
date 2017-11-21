@@ -13,6 +13,11 @@ class PathMgr(object):
         return path_dir[:path_dir.rindex(os.path.sep)]
 
     @staticmethod
+    def get_config_path():
+        project_path = PathMgr.get_project_path()
+        return os.path.join(project_path, 'config.conf')
+
+    @staticmethod
     def get_log_path(sub_path = None):
         project_path = PathMgr.get_project_path()
         if sub_path:
@@ -25,7 +30,7 @@ class PathMgr(object):
     @staticmethod
     def get_command_file_path(cmd_name):
         project_path = PathMgr.get_project_path()
-        return os.path.join(project_path, "ibapi", 'commands',  cmd_name + '.py')
+        return os.path.join(project_path, "ibbasic", 'commands',  cmd_name + '.py')
 
     @staticmethod
     def get_data_file_path(filename):
