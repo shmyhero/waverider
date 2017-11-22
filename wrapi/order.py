@@ -41,7 +41,7 @@ def order_target_percent(asset, percent, style=OrderStyle.MarketOrder, sec_type 
 def get_open_orders(asset=None):
     orders = API().get_open_orders()
     if asset:
-        orders = filter(lambda x: x[0] == asset, orders)
+        orders = filter(lambda x: x[1] == asset, orders)
     rows = map(lambda x: x[1:], orders)
     orderids = map(lambda x: int(x[0]), orders)
     fields = ['symbol', 'action', 'quantity']
