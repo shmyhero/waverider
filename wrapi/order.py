@@ -54,7 +54,7 @@ def cancel_order(order_id):
 
 def set_stop_price(asset, stop_price):
     quantity = API().get_portfolio_info().get_quantity(asset)
-    order_target(asset, -quantity, OrderStyle.StopOrder(stop_price))
+    return order_target(asset, -quantity, OrderStyle.StopOrder(stop_price))
 
 if __name__ == '__main__':
     # API related functions below:
