@@ -26,9 +26,10 @@ class API(object):
     @staticmethod
     def parse_contract(content):
         symbol = string_fetch(content, '\'m_symbol\': \'', '\'')
-        position = int(string_fetch(content, 'position=', ','))
+        quantity = int(string_fetch(content, 'position=', ','))
         market_price = float(string_fetch(content, 'marketPrice=', ','))
-        return [symbol, [position, market_price]]
+        cost_price = float(string_fetch(content, 'averageCost=', ','))
+        return [symbol, [quantity, market_price, cost_price]]
 
     @staticmethod
     def parse_order(content):
@@ -60,14 +61,14 @@ class API(object):
 
     def get_portfolio_info(self):
         output = self.run_cmd('account')
-        total_cash = float(string_fetch(output, 'TotalCashValue, value=', ','))
+        available_funds = float(string_fetch(output, 'AvailableFunds, value=', ','))
         net_liquidation = float(string_fetch(output, 'NetLiquidation, value=', ','))
         items = output.split('<updatePortfolio')
         if len(items) > 0:
             contract_dict = list_to_hash(map(API.parse_contract, items[1:]))
         else:
             contract_dict = {}
-        return Portfolio(total_cash, net_liquidation, contract_dict)
+        return Portfolio(available_funds, net_liquidation, contract_dict)
 
     def get_open_orders(self):
         output = self.run_cmd('get_open_orders')
