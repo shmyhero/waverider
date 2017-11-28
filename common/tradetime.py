@@ -131,7 +131,7 @@ if __name__ == '__main__':
     print TradeTime.is_market_open(datetime.datetime(2017, 11, 6, 15, 15, 0))
     print TradeTime.is_market_open()
 
-    t =  datetime.datetime(2017, 11, 6, 15, 15, 0, tzinfo=pytz.timezone('US/Eastern'))
+    t = datetime.datetime(2017, 11, 6, 15, 15, 0, tzinfo=pytz.timezone('US/Eastern'))
     print t.astimezone(pytz.timezone('US/Eastern'))
     print t.astimezone(pytz.utc)
     print t.astimezone(pytz.timezone('Asia/Shanghai'))
