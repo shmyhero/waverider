@@ -27,3 +27,7 @@ class ConfigMgr(dict):
     @staticmethod
     def get_ib_config():
         return ConfigMgr.get_config()['ib']
+
+    @staticmethod
+    def get_db_config():
+        return ConfigMgr.get_config()['db']

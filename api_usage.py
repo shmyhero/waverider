@@ -1,10 +1,10 @@
 from wrapi.order import OrderStyle, get_open_orders, order_target, order_target_percent, cancel_order, set_stop_price
-from context import Context
+from wrapi.context import Context
 
 if __name__ == '__main__':
     print get_open_orders()
-    #print get_open_orders('UBT')
-    # order_target('UBT', 10)
+    # print get_open_orders('UBT')
+    # order_target('SPY', 10, OrderStyle.LimitOrder(260))
     # order_target('QQQ', 12)
     # order_target_percent('SPY', 0.05)
     # order_target('QQQ', 31, style=OrderStyle.MarketOrder)
@@ -20,5 +20,7 @@ if __name__ == '__main__':
     print context.portfolio.positions['SPY'].amount
     print context.portfolio.positions['SPY'].last_sale_price
     print context.portfolio.positions['SPY'].cost_basic
+    # context.abc = 1
+    # print context.abc
 
 
