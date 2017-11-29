@@ -80,7 +80,7 @@ class MarketWatchScraper(WebScraper):
         sub_content = string_fetch(content, 'mw-rangeBar precision=', 'Day Low')
         #print sub_content
         open = float(string_fetch(sub_content, 'day-open=\"', '\"'))
-        close = float(string_fetch(sub_content, 'bar-low=\"', '\"'))
+        close = float(string_fetch(sub_content, '\"last-value\">', '</span>'))
         high = float(string_fetch(sub_content, 'range-high=\"', '\"'))
         low = float(string_fetch(sub_content, 'range-low=\"', '\"'))
         return [open, close, high, low]
