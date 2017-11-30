@@ -11,9 +11,6 @@ class OrderTest(unittest.TestCase):
         for order_id in self.order_id_lst:
             cancel_order(order_id)
 
-    def foo(self):
-        pass
-
     def test_order_target(self):
         order_id = order_target('SPY', 10)
         self.order_id_lst.append(order_id)
