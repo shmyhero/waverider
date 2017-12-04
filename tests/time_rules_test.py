@@ -41,8 +41,8 @@ class TimeRulesTest(unittest.TestCase):
         self.assertFalse(time_rules.market_close(1, 0).validate(datetime.datetime(2017, 12, 2, 15, 0, 0)))
 
     def test_half_day_trade_for_market_close(self):
-        self.assertTrue(time_rules.market_close().validate(datetime.datetime(2017, 11, 24, 13, 29, 0)))
-        self.assertTrue(time_rules.market_close(1, 30).validate(datetime.datetime(2017, 11, 24, 12, 0, 0)))
+        self.assertTrue(time_rules.market_close().validate(datetime.datetime(2017, 11, 24, 12, 59, 0)))
+        self.assertTrue(time_rules.market_close(1, 0).validate(datetime.datetime(2017, 11, 24, 12, 0, 0)))
         self.assertFalse(time_rules.market_close(minutes=15).validate(datetime.datetime(2017, 11, 24, 15, 45, 0)))
 
     def test_invalid_parameters_in_market_close(self):
