@@ -66,19 +66,22 @@ class BarChartScraper(WebScraper):
     def get_current_data(self, symbols):
         url_template = "http://marketdata.websol.barchart.com/getQuote.json?apikey=7aa9a38e561042d48e32f3b469b730d8&symbols={}"
         url = url_template.format(','.join(symbols))
-        #print url
+        # print url
         content = HttpHelper.http_get(url)
-        #print content
+        # print content
         return list(BarChartScraper.parse_content(content))
 
 
 class MarketWatchScraper(WebScraper):
 
+    def __init__(self):
+        pass
+
     def get_prices(self, url):
         content = HttpHelper.http_get(url)
-        #print content
+        # print content
         sub_content = string_fetch(content, 'mw-rangeBar precision=', 'Day Low')
-        #print sub_content
+        # print sub_content
         open = float(string_fetch(sub_content, 'day-open=\"', '\"'))
         close = float(string_fetch(sub_content, '\"last-value\">', '</span>'))
         high = float(string_fetch(sub_content, 'range-high=\"', '\"'))
