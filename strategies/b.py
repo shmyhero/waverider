@@ -15,10 +15,10 @@ def my_func(context, data):
     print data.current('QQQ')
 
 
-def handle_data(context, data):
-    print '\n----------output for handle data in b strategy------------'
-    print context.portfolio.positions_value
-    print data.current('QQQ')
-    print '----------end of handle data in b strategy------------\n'
+#def handle_data(context, data):
+#    print '\n----------output for handle data in b strategy------------'
+#    print context.portfolio.positions_value
+#    print data.current('QQQ')
+#    print '----------end of handle data in b strategy------------\n'
 
 

@@ -61,7 +61,10 @@ class Container(object):
 
     @staticmethod
     def get_handle_function(strategy_name):
-        return Container._handle_data_dic[strategy_name]
+        if strategy_name in Container._handle_data_dic.keys():
+            return Container._handle_data_dic[strategy_name]
+        else:
+            return None
 
 
 def schedule_function(func, date_rule, time_rule):

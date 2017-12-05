@@ -26,7 +26,8 @@ class StrategyRunner(object):
         s = importlib.import_module('strategies.{}'.format(strategy_name))
         Container.set_current_strategy(strategy_name)
         s.initialize(Container.context)
-        Container.register_handle_data(strategy_name, s.handle_data)
+        if hasattr(s, 'handle_data'):
+            Container.register_handle_data(strategy_name, s.handle_data)
         StrategyRunner.logger.info('initialize strategy %s completed.' % strategy_name, False)
 
     @staticmethod
@@ -39,8 +40,8 @@ class StrategyRunner(object):
             StrategyRunner.logger.info('check schedule functions....')
             for schedule_function in schedule_functions:
                 schedule_function.run(start_time)
-            StrategyRunner.logger.info('check handle functions....')
-            if TradeTime.is_market_open():
+            if handle_function is not None:
+                StrategyRunner.logger.info('check handle functions....')
                 handle_function()
             end_time = datetime.datetime.now()
             next_start_time = datetime.datetime(start_time.year, start_time.month, start_time.day, start_time.hour,
@@ -79,7 +80,7 @@ class StrategyRunner(object):
 
 if __name__ == '__main__':
     #pass
-    StrategyRunner.run('a')
+    StrategyRunner.run('b')
     #time.sleep(5)
     #StrategyRunner.run_strategy_in_real_time('b')
 
