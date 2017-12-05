@@ -1,6 +1,7 @@
 from wrapi.order import OrderStyle, get_open_orders, order_target, order_target_percent, cancel_order, set_stop_price
 from wrapi.context import Context
 from wrapi.data import Data
+from wrapi.strategy_runner import StrategyRunner
 
 if __name__ == '__main__':
     # print get_open_orders()
@@ -23,10 +24,11 @@ if __name__ == '__main__':
     # print context.portfolio.positions['SPY'].cost_basic
     # context.abc = 1
     # print context.abc
-    data = Data()
+    # data = Data()
     # print data.history('QQQ', field='close', window=100)
     # print data.history(['SPY', 'VIX'], window=252)
-    print data.current(['SPY', 'VIX'])
+    # print data.current(['SPY', 'VIX'])
+    StrategyRunner.run('a')
 
 
 

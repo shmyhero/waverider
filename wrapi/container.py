@@ -1,5 +1,8 @@
+import datetime
+import pytz
 from wrapi.context import Context
 from wrapi.data import Data
+
 
 class ScheduleFunction(object):
 
@@ -9,7 +12,12 @@ class ScheduleFunction(object):
         self.time_rule = time_rule
 
     def run(self, current_time):
-        if self.date_rule.validate(current_time) and self.time_rule.validate(current_time):
+        native_dt = datetime.datetime.now()
+        us_dt = datetime.datetime.now(pytz.timezone('US/Eastern'))
+        delta_hour = datetime.datetime(native_dt.year, native_dt.month, native_dt.day, native_dt.hour, native_dt.minute, 0) - datetime.datetime(us_dt.year, us_dt.month, us_dt.day, us_dt.hour, us_dt.minute, 0)
+        dt = current_time - delta_hour
+        #dt += datetime.timedelta(hours=13)
+        if self.date_rule.validate(dt) and self.time_rule.validate(dt):
             self.my_func()
 
 

@@ -1,13 +1,19 @@
 import datetime
 import time
 import importlib
+import pytz
 from multiprocessing import Process
+from utils.logger import Logger
+from common.pathmgr import PathMgr
+from common.tradetime import TradeTime
 from wrapi.container import Container
 
 
 class StrategyRunner(object):
 
-    running_strategies = []
+    logger = Logger(__name__, PathMgr.get_log_path())
+
+    _running_strategies = []
 
     @staticmethod
     def init_strategy(strategy_name):
@@ -16,10 +22,12 @@ class StrategyRunner(object):
         :param strategy_name:
         :return:
         """
+        StrategyRunner.logger.info('initialize strategy %s...'%strategy_name, False)
         s = importlib.import_module('strategies.{}'.format(strategy_name))
         Container.set_current_strategy(strategy_name)
         s.initialize(Container.context)
         Container.register_handle_data(strategy_name, s.handle_data)
+        StrategyRunner.logger.info('initialize strategy %s completed.' % strategy_name, False)
 
     @staticmethod
     def listener(strategy_name):
@@ -28,42 +36,51 @@ class StrategyRunner(object):
         start_time = None
         while True:
             start_time = start_time or datetime.datetime.now()
+            StrategyRunner.logger.info('check schedule functions....')
             for schedule_function in schedule_functions:
                 schedule_function.run(start_time)
-            handle_function()
+            StrategyRunner.logger.info('check handle functions....')
+            if TradeTime.is_market_open():
+                handle_function()
             end_time = datetime.datetime.now()
             next_start_time = datetime.datetime(start_time.year, start_time.month, start_time.day, start_time.hour,
-                                                start_time.minute, 0) + datetime.timedelta(minutes=1)
+                                                start_time.minute, 0, ) + datetime.timedelta(minutes=1)
+            # print 'start_time=%s, end_time=%s, delta=%s' % (start_time, end_time, end_time-start_time)
             if (end_time - start_time) < datetime.timedelta(minutes=1):
+                # print 'next_start_time=%s'%next_start_time
                 interval = (next_start_time - datetime.datetime.now()).total_seconds()
+                # print 'interval=%s'%interval
                 if interval > 0:
                     time.sleep(interval)
             else:
-                # TODO: logger.warn('your function runs exceed 1 minutes')
-                pass
+                StrategyRunner.logger.warning('your function runs exceed 1 minutes')
             start_time = next_start_time
 
     @staticmethod
-    def run_strategy(strategy_name):
+    def run(strategy_name):
         """
-        it can support parallel running for different strategy, however, multiple strategies may lead to too frequency
+        it can support parallel running for different strategies, however, multiple strategies may lead to too frequency
         to call the IB API, the IB API doesn't support multiple thread/process, it may failed if 2 strategy call IB API
-        at the same time or in short time interval...
+        at the same time or in short time interval.
+        if we want to debug it, do not use multiple process.
         :param strategy_name:
         :return:
         """
-        if strategy_name not in StrategyRunner.running_strategies:
-            StrategyRunner.running_strategies.append(strategy_name)
+        if strategy_name not in StrategyRunner._running_strategies:
+            StrategyRunner._running_strategies.append(strategy_name)
             StrategyRunner.init_strategy(strategy_name)
-            p = Process(target=StrategyRunner.listener, args=(strategy_name,))
-            p.start()
-            # StrategyRunner.listener(strategy_name)
+            StrategyRunner.logger.info('run strategy %s ...' % strategy_name)
+            # p = Process(target=StrategyRunner.listener, args=(strategy_name,))
+            # p.start()
+            StrategyRunner.listener(strategy_name)
+        else:
+            StrategyRunner.logger.info('Strategy %s is already running...' % strategy_name)
 
 
 if __name__ == '__main__':
-    pass
-    #StrategyRunner.run_strategy('a')
+    #pass
+    StrategyRunner.run('a')
     #time.sleep(5)
-    #StrategyRunner.run_strategy('b')
+    #StrategyRunner.run_strategy_in_real_time('b')
 
 
