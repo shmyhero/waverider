@@ -1,4 +1,5 @@
 import unittest
+import time
 from wrapi.order import order_target, order_target_percent, get_open_orders, cancel_order, set_stop_price
 
 
@@ -8,6 +9,7 @@ class OrderTest(unittest.TestCase):
         self.order_id_lst = []
 
     def tearDown(self):
+        time.sleep(2)
         open_orders = get_open_orders().index.values
         for order_id in self.order_id_lst:
             if order_id in open_orders:

@@ -96,7 +96,6 @@ class MarketWatchScraper(WebScraper):
         return map(self.get_symbol_data, symbols)
 
 
-
 if __name__ == '__main__':
     #print YahooScraper().get_current_data(['SPX', 'SPY'])
     #print YahooScraper().get_current_data(['YM=F', 'ES=F'])
