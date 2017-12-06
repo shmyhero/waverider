@@ -1,5 +1,7 @@
 import datetime
 import pytz
+from utils.logger import Logger
+from common.pathmgr import PathMgr
 from wrapi.context import Context
 from wrapi.data import Data
 
@@ -16,7 +18,7 @@ class ScheduleFunction(object):
         us_dt = datetime.datetime.now(pytz.timezone('US/Eastern'))
         delta_hour = datetime.datetime(native_dt.year, native_dt.month, native_dt.day, native_dt.hour, native_dt.minute, 0) - datetime.datetime(us_dt.year, us_dt.month, us_dt.day, us_dt.hour, us_dt.minute, 0)
         dt = current_time - delta_hour
-        #dt += datetime.timedelta(hours=13)
+        # dt += datetime.timedelta(hours=13)
         if self.date_rule.validate(dt) and self.time_rule.validate(dt):
             self.my_func()
 
@@ -27,11 +29,13 @@ class Container(object):
 
     context = Context()
 
+    current_strategy = None
+
     _schedule_function_dic = {}
 
     _handle_data_dic = {}
 
-    current_strategy = None
+    _logger_dict = {}
 
     @staticmethod
     def set_current_strategy(strategy_name):
@@ -65,6 +69,12 @@ class Container(object):
             return Container._handle_data_dic[strategy_name]
         else:
             return None
+
+    @staticmethod
+    def get_logger(strategy_name):
+        if strategy_name not in Container._logger_dict.keys():
+            Container._logger_dict[strategy_name] = Logger(strategy_name, PathMgr.get_log_path(strategy_name))
+        return Container._logger_dict[strategy_name]
 
 
 def schedule_function(func, date_rule, time_rule):

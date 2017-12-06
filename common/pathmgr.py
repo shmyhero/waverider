@@ -18,7 +18,7 @@ class PathMgr(object):
         return os.path.join(project_path, 'config.conf')
 
     @staticmethod
-    def get_log_path(sub_path = None):
+    def get_log_path(sub_path=None):
         project_path = PathMgr.get_project_path()
         if sub_path:
             log_path = os.path.join(project_path, "logs", sub_path)

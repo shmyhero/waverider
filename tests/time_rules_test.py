@@ -14,6 +14,7 @@ class TimeRulesTest(unittest.TestCase):
 
     def test_negative_market_open(self):
         self.assertFalse(time_rules.market_open().validate(datetime.datetime(2017, 11, 29, 9, 30, 0)))
+        # Nov 23 is holiday
         self.assertFalse(time_rules.market_open().validate(datetime.datetime(2017, 11, 23, 9, 31, 0)))
         self.assertFalse(time_rules.market_open(1, 0).validate(datetime.datetime(2017, 12, 2, 10, 30, 0)))
 

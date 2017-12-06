@@ -9,6 +9,7 @@ def msg_handler(msg):
 def order_handler(msg):
     print 'order_obj:%s' % msg.order.__dict__
 
+
 def contract_handler(msg):
     print 'contract_obj:%s' % msg.contract.__dict__
 

@@ -13,7 +13,7 @@ def initialize(context):
     # context.caa_lower_bounds   = [[0.00],[0.00],[0.00],[0.00],[0.00],[0.00],[0.00],[0.00]]
     # context.caa_upper_bounds   = [[0.25],[0.25],[0.25],[0.25],[0.25],[0.25],[1.00],[1.00]]
 
-    context.caa_stocks = symbols('SSO', 'BIL')  # N-8 Universe
+    context.caa_stocks = symbols('SSO', 'BIL')  # N-8 Universe ['SSO', 'BIL']
     context.caa_lower_bounds = [[0.00], [0.00]]
     context.caa_upper_bounds = [[1.00], [0.10]]
 

@@ -8,8 +8,10 @@ class OrderTest(unittest.TestCase):
         self.order_id_lst = []
 
     def tearDown(self):
+        open_orders = get_open_orders().index.values
         for order_id in self.order_id_lst:
-            cancel_order(order_id)
+            if order_id in open_orders:
+                cancel_order(order_id)
 
     def test_order_target(self):
         order_id = order_target('SPY', 10)
