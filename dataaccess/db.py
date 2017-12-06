@@ -3,7 +3,7 @@ import traceback
 import mysql.connector
 from utils.logger import Logger
 from common.pathmgr import PathMgr
-from configmgr import ConfigMgr
+from common.configmgr import ConfigMgr
 
 
 class BaseDAO(object):

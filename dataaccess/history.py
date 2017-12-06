@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from dataaccess.symbols import Symbols
 from dataaccess.db import YahooEquityDAO
-from tradetime import TradeTime
+from common.tradetime import TradeTime
 
 
 class AbstractHistoricalDataProvider(object):
