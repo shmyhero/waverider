@@ -136,7 +136,7 @@ class date_rules(object):
         pass
 
     @staticmethod
-    def everyday():
+    def every_day():
         return EveryDayRule()
 
     @staticmethod

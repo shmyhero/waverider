@@ -9,14 +9,16 @@ class Data(object):
         self.historical_data_provider = DBProvider()
         self.current_data_provider = MarketWatchScraper()
 
-    def history(self, assets, field='price', window=30):
+    def history(self, assets, field='price', window=30, frequency='1d'):
         """
         get the history data
         :param assets: symbol likes SPX, SPY, VIX, QQQ, etc, or iterable asset
         :param field: support open, close, high, low, price, the price = close
         :param window: the count of records.
+        :param frequency: this parameter used for compatible with quantopian algorithm.
         :return:
         """
+        frequency = '1d'
         if hasattr(assets, '__iter__'):
             results = None
             columns = ['date']

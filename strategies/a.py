@@ -7,7 +7,7 @@ from wrapi.qutopian_functions import log
 def initialize(context):
     schedule_function(
         func=my_func,
-        date_rule=date_rules.everyday(),
+        date_rule=date_rules.every_day(),
         time_rule=time_rules.market_open(minutes=69))
 
 

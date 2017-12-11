@@ -8,17 +8,17 @@ import pandas as pd
 
 
 def initialize(context):
-    context.caa_tv = 0.08  # Target anual volatility
-    # context.caa_stocks   = symbols('SPY','QQQ', 'EFA', 'EEM', 'EWJ', 'HYG', 'IEF', 'BIL') # N-8 Universe
-    # context.caa_lower_bounds   = [[0.00],[0.00],[0.00],[0.00],[0.00],[0.00],[0.00],[0.00]]
-    # context.caa_upper_bounds   = [[0.25],[0.25],[0.25],[0.25],[0.25],[0.25],[1.00],[1.00]]
+    context.caa_tv = 0.08  # Target annual volatility
+    context.caa_stocks = symbols('SPY', 'QQQ',  'EFA',  'EEM',  'EWJ',  'HYG',  'IEF',  'BIL')  # N-8 Universe
+    context.caa_lower_bounds = [[0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00]]
+    context.caa_upper_bounds = [[0.25], [0.25], [0.25], [0.25], [0.25], [0.25], [1.00], [1.00]]
 
-    context.caa_stocks = symbols('SSO', 'BIL')  # N-8 Universe ['SSO', 'BIL']
-    context.caa_lower_bounds = [[0.00], [0.00]]
-    context.caa_upper_bounds = [[1.00], [0.10]]
+    # context.caa_stocks = symbols('SSO', 'BIL')  # N-8 Universe ['SSO', 'BIL']
+    # context.caa_lower_bounds = [[0.00], [0.00]]
+    # context.caa_upper_bounds = [[1.00], [0.10]]
 
     schedule_function(caa_rebalance,
-                      date_rules.month_end(),
+                      date_rules.every_day(),
                       time_rules.market_close(minutes=15))
 
 
@@ -28,7 +28,7 @@ def caa_rebalance(context, data):
     R = np.log(prices).diff().dropna()
     covar = R.cov().values
 
-    R12 = (prices.iloc[-1] - prices.iloc[-252]) / prices.iloc[-252]  # 1 year return
+    R12 = (prices.iloc[-1] - prices.iloc[-250]) / prices.iloc[-250]  # 1 year return
     R1 = (prices.iloc[-1] - prices.iloc[-21 * 1]) / prices.iloc[-21 * 1]  # recent 1 month return
     R3 = (prices.iloc[-1] - prices.iloc[-21 * 3]) / prices.iloc[-21 * 3]  # recent 3 month return
     R6 = (prices.iloc[-1] - prices.iloc[-21 * 6]) / prices.iloc[-21 * 6]  # recent 6 month return
@@ -45,12 +45,13 @@ def caa_rebalance(context, data):
         cla.solve()
         weights = pd.Series(getWeights(cla, context.caa_tv).flatten(), index=R.columns)
         for stock in weights.index:
-            log.info(stock.symbol + ':\t\t' + str(round(weights[stock], 3)))
-            if stock.symbol not in ['BIL']:
+            # print weights[stock]
+            log.info(stock + ':\t\t' + str(round(weights[stock], 3)))
+            if stock not in ['BIL']:
                 order_target_percent(stock, round(weights[stock], 3))
     except Exception as e:
         # Reset the trade date to try again on the next bar
-        log.debug(e)
+        log.error(e)
 
 
 def getWeights(cla, tv):
@@ -105,8 +106,8 @@ class CLA:
                     covarF_inv = np.linalg.inv(covarF)
                     l, bi = self.computeLambda(covarF_inv, covarFB, meanF, wB, meanF.shape[0] - 1, \
                                                self.w[-1][i])
-                    if (self.l[-1] == None or l < self.l[-1]) and l > l_out: l_out, i_out = l, i
-            if (l_in == None or l_in < 0) and (l_out == None or l_out < 0):
+                    if (self.l[-1] is None or l < self.l[-1]) and l > l_out: l_out, i_out = l, i
+            if (l_in is None or l_in < 0) and (l_out is None or l_out < 0):
                 # 3) compute minimum variance solution
                 self.l.append(0)
                 covarF, covarFB, meanF, wB = self.getMatrices(f)
@@ -162,7 +163,7 @@ class CLA:
         onesF = np.ones(meanF.shape)
         g1 = np.dot(np.dot(onesF.T, covarF_inv), meanF)
         g2 = np.dot(np.dot(onesF.T, covarF_inv), onesF)
-        if wB == None:
+        if wB is None:
             g, w1 = float(-self.l[-1] * g1 / g2 + 1 / g2), 0
         else:
             onesB = np.ones(wB.shape)
@@ -188,7 +189,7 @@ class CLA:
         # 2) bi
         if type(bi) == list: bi = self.computeBi(c, bi)
         # 3) Lambda
-        if wB == None:
+        if wB is None:
             # All free assets
             return float((c4[i] - c1 * bi) / c), bi
         else:
@@ -303,7 +304,7 @@ class CLA:
 
     def goldenSection(self, obj, a, b, **kargs):
         # Golden section method. Maximum if kargs['minimum']==False is passed
-        from math import log, ceil
+        from math import ceil
         tol, sign, args = 1.0e-9, 1, None
         if 'minimum' in kargs and kargs['minimum'] == False: sign = -1
         if 'args' in kargs: args = kargs['args']

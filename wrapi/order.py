@@ -31,7 +31,11 @@ def order_target_percent(asset, percent, style=OrderStyle.MarketOrder, sec_type 
     current_percent = portfolio.get_percentage(asset)
     order_cash = (percent - current_percent) * portfolio.net_liquidation
     if order_cash < portfolio.available_funds:
-        market_price = API().get_market_price(asset)
+        try:
+            market_price = API().get_market_price(asset)
+        except Exception:
+            from wrapi.data import Data
+            market_price = Data().current(asset)
         amount = int(round(order_cash/market_price))
         return order_target(asset, amount, style)
     else:
