@@ -2,6 +2,8 @@ import sys
 from ib.ext.Contract import Contract
 from ib.ext.Order import Order
 from ib.opt import Connection
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), "../../"))
 from common.configmgr import ConfigMgr
 
 
