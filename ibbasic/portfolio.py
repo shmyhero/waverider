@@ -15,6 +15,9 @@ class Position(object):
     def cost(self):
         return self.amount * self.cost_basic
 
+    def __str__(self):
+            return str(self.__dict__)
+
 
 class Portfolio(object):
 
@@ -55,9 +58,8 @@ class Portfolio(object):
     def capital_used(self):
         return sum(map(lambda x: x.cost, self.positions.values()))
 
-
-def __str__(self):
-        return str(self.__dict__)
+    def __str__(self):
+            return str(self.__dict__)
 
 
 

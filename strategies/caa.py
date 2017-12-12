@@ -9,13 +9,13 @@ import pandas as pd
 
 def initialize(context):
     context.caa_tv = 0.08  # Target annual volatility
-    context.caa_stocks = symbols('SPY', 'QQQ',  'EFA',  'EEM',  'EWJ',  'HYG',  'IEF',  'BIL')  # N-8 Universe
-    context.caa_lower_bounds = [[0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00]]
-    context.caa_upper_bounds = [[0.25], [0.25], [0.25], [0.25], [0.25], [0.25], [1.00], [1.00]]
+    # context.caa_stocks = symbols('SPY', 'QQQ',  'EFA',  'EEM',  'EWJ',  'HYG',  'IEF',  'BIL')  # N-8 Universe
+    # context.caa_lower_bounds = [[0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00]]
+    # context.caa_upper_bounds = [[0.25], [0.25], [0.25], [0.25], [0.25], [0.25], [1.00], [1.00]]
 
-    # context.caa_stocks = symbols('SSO', 'BIL')  # N-8 Universe ['SSO', 'BIL']
-    # context.caa_lower_bounds = [[0.00], [0.00]]
-    # context.caa_upper_bounds = [[1.00], [0.10]]
+    context.caa_stocks = symbols('SSO', 'QQQ', 'EFA', 'EEM', 'EWJ', 'HYG', 'IEF', 'BIL')  # N-8 Universe ['SSO', 'BIL']
+    context.caa_lower_bounds = [[0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00]]
+    context.caa_upper_bounds = [[0.25], [0.25], [0.25], [0.25], [0.25], [0.25], [0.25], [1.00]]
 
     schedule_function(caa_rebalance,
                       date_rules.every_day(),
@@ -28,7 +28,7 @@ def caa_rebalance(context, data):
     R = np.log(prices).diff().dropna()
     covar = R.cov().values
 
-    R12 = (prices.iloc[-1] - prices.iloc[-250]) / prices.iloc[-250]  # 1 year return
+    R12 = (prices.iloc[-1] - prices.iloc[-252]) / prices.iloc[-252]  # 1 year return
     R1 = (prices.iloc[-1] - prices.iloc[-21 * 1]) / prices.iloc[-21 * 1]  # recent 1 month return
     R3 = (prices.iloc[-1] - prices.iloc[-21 * 3]) / prices.iloc[-21 * 3]  # recent 3 month return
     R6 = (prices.iloc[-1] - prices.iloc[-21 * 6]) / prices.iloc[-21 * 6]  # recent 6 month return
