@@ -1,7 +1,10 @@
 import sys
 import time
 from ib.opt import Connection
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), "../../"))
 from common.configmgr import ConfigMgr
+
 
 def error_handler(msg):
     """Handles the capturing of error messages"""
