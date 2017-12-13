@@ -53,7 +53,7 @@ class API(object):
         if server_error_msg in output:
             items = output.split(server_error_msg)[1:]
             error_items = map(lambda x: [string_fetch(x, 'errorCode=', ','), string_fetch(x, 'errorMsg=', '>')], items)
-            ignore_error_codes = ['2104', '2016']
+            ignore_error_codes = ['2104', '2016', '399']  # 399 for market not open
             filtered_error_items = filter(lambda x: x[0] not in ignore_error_codes, error_items)
             if len(filtered_error_items) > 0:
                 exception_msg = str(map(lambda x: 'errorCode={}, errorMsg={}'.format(x[0], x[1]), filtered_error_items))

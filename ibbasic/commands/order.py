@@ -3,6 +3,7 @@ from ib.ext.Contract import Contract
 from ib.ext.Order import Order
 from ib.opt import Connection
 import os
+import time
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../"))
 from common.configmgr import ConfigMgr
 
@@ -78,11 +79,13 @@ def main(order_id, symbol, sec_type, order_type, quantity, action, price = None)
     # Use the connection to the send the order to IB
     tws_conn.placeOrder(order_id, contract, order)
 
+    time.sleep(1)
     # Disconnect from TWS
     tws_conn.disconnect()
 
 
 if __name__ == "__main__":
+    # sys.argv = ['order.py', '100193', 'QQQ', 'STK', 'MKT', '12', 'BUY']
     order_id = int(sys.argv[1])
     symbol = sys.argv[2]
     sec_type = sys.argv[3]
@@ -96,4 +99,5 @@ if __name__ == "__main__":
         except Exception:
             pass
     main(order_id, symbol, sec_type, order_type, quantity, action, price)
+
 
