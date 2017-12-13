@@ -36,10 +36,10 @@ class OrderTest(unittest.TestCase):
             self.order_id_lst.remove(order_id)
 
     def test_too_much_order(self):
-        order_id = order_target('SPY', 1000000000)
-        order_ids = get_open_orders().index.values
-        flag = order_id in order_ids
-        self.assertFalse(flag)
+        with self.assertRaises(Exception) as context:
+            order_target('SPY', 1000000000)
+            self.assertTrue('Invalid value in field' in context.exception)
+
 
     def test_too_much_order2(self):
         with self.assertRaises(Exception) as context:
