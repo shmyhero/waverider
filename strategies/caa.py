@@ -22,6 +22,12 @@ def initialize(context):
                       time_rules.market_close(minutes=15))
 
 
+def handle_data(context, data):
+    log.info('----------output for handle data in a strategy------------')
+    log.info('spy price: %s'% data.current('SPY'))
+
+
+
 def caa_rebalance(context, data):
     prices = data.history(context.caa_stocks, 'price', 252, '1d').dropna()
     N = len(context.caa_stocks)

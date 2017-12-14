@@ -40,7 +40,6 @@ class OrderTest(unittest.TestCase):
             order_target('SPY', 1000000000)
             self.assertTrue('Invalid value in field' in context.exception)
 
-
     def test_too_much_order2(self):
         with self.assertRaises(Exception) as context:
             order_target_percent('QQQ', 2)
