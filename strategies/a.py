@@ -24,5 +24,3 @@ def handle_data(context, data):
     print data.current('SPY')
     log.info('----------end of handle data in a strategy------------')
 
-
-
