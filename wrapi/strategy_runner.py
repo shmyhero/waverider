@@ -1,7 +1,7 @@
 import datetime
 import time
 import importlib
-import pytz
+import traceback
 from multiprocessing import Process
 from utils.logger import Logger
 from common.pathmgr import PathMgr
@@ -39,10 +39,18 @@ class StrategyRunner(object):
             start_time = start_time or datetime.datetime.now()
             StrategyRunner.logger.info('check schedule functions....')
             for schedule_function in schedule_functions:
-                schedule_function.run(start_time)
+                try:
+                    schedule_function.run(start_time)
+                except Exception as e:
+                    StrategyRunner.logger.error('Trace: ' + traceback.format_exc(), False)
+                    StrategyRunner.logger.error('Error: get action arguments failed:' + str(e))
             if handle_function is not None:
                 StrategyRunner.logger.info('check handle functions....')
-                handle_function()
+                try:
+                    handle_function()
+                except Exception as e:
+                    StrategyRunner.logger.error('Trace: ' + traceback.format_exc(), False)
+                    StrategyRunner.logger.error('Error: get action arguments failed:' + str(e))
             end_time = datetime.datetime.now()
             next_start_time = datetime.datetime(start_time.year, start_time.month, start_time.day, start_time.hour,
                                                 start_time.minute, 0, ) + datetime.timedelta(minutes=1)

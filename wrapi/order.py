@@ -62,8 +62,8 @@ def set_stop_price(asset, stop_price):
 
 if __name__ == '__main__':
     # API related functions below:
-    print get_open_orders()
-    #order_target('SPY', 10)
+    #print get_open_orders()
+    order_target('SPY', 10)
     #order_target_percent('AAPL', 0.01)
     #order_target('QQQ', 30, style=OrderStyle.MarketOrder)
     #order_target('SPY', 12, style=OrderStyle.StopOrder(249.0))

@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from utils.logger import Logger
 from dataaccess.symbols import Symbols
 from dataaccess.db import YahooEquityDAO
 from common.tradetime import TradeTime
@@ -14,8 +15,8 @@ class AbstractHistoricalDataProvider(object):
 
 class DBProvider(AbstractHistoricalDataProvider):
 
-    def __init__(self):
-        pass
+    def __init__(self, logger=Logger(__name__, None)):
+        self.logger = logger
 
     def history(self, symbol, field, window):
         fields_dic = {'open': 'openPrice', 'close': 'adjclosePrice', 'high': 'highPrice', 'low': 'lowPrice',
