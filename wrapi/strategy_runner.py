@@ -11,7 +11,20 @@ from wrapi.container import Container
 
 class StrategyRunner(object):
 
-    logger = Logger(__name__, PathMgr.get_log_path())
+    _logger = None
+
+    _current_date = datetime.date.today()
+
+    @staticmethod
+    def get_logger():
+        if StrategyRunner._logger is None:
+            StrategyRunner._logger = Logger(__name__, PathMgr.get_log_path())
+            StrategyRunner._current_date = datetime.date.today()
+        elif StrategyRunner._current_date == datetime.date.today():
+            return StrategyRunner._logger
+        else:
+            StrategyRunner._logger = Logger(__name__, PathMgr.get_log_path())
+            StrategyRunner._current_date = datetime.date.today()
 
     _running_strategies = []
 
@@ -22,13 +35,14 @@ class StrategyRunner(object):
         :param strategy_name:
         :return:
         """
-        StrategyRunner.logger.info('initialize strategy %s...'%strategy_name, False)
+        logger = StrategyRunner.get_logger()
+        logger.info('initialize strategy %s...'%strategy_name, False)
         s = importlib.import_module('strategies.{}'.format(strategy_name))
         Container.set_current_strategy(strategy_name)
         s.initialize(Container.context)
         if hasattr(s, 'handle_data'):
             Container.register_handle_data(strategy_name, s.handle_data)
-        StrategyRunner.logger.info('initialize strategy %s completed.' % strategy_name, False)
+        logger.info('initialize strategy %s completed.' % strategy_name, False)
 
     @staticmethod
     def listener(strategy_name):
@@ -37,23 +51,24 @@ class StrategyRunner(object):
         start_time = None
         while True:
             start_time = start_time or datetime.datetime.now()
-            StrategyRunner.logger.info('check schedule functions...')
+            logger = StrategyRunner.get_logger()
+            logger.info('check schedule functions...')
             for schedule_function in schedule_functions:
                 try:
                     schedule_function.run(start_time)
                 except Exception as e:
-                    StrategyRunner.logger.error('Trace: ' + traceback.format_exc(), False)
-                    StrategyRunner.logger.error('Error: get action arguments failed:' + str(e))
+                    logger.error('Trace: ' + traceback.format_exc(), False)
+                    logger.error('Error: get action arguments failed:' + str(e))
             if handle_function is not None:
-                StrategyRunner.logger.info('check handle functions...')
+                logger.info('check handle functions...')
                 if TradeTime.is_market_open():
                     try:
                         handle_function()
                     except Exception as e:
-                        StrategyRunner.logger.error('Trace: ' + traceback.format_exc(), False)
-                        StrategyRunner.logger.error('Error: get action arguments failed:' + str(e))
+                        logger.error('Trace: ' + traceback.format_exc(), False)
+                        logger.error('Error: get action arguments failed:' + str(e))
                 else:
-                    StrategyRunner.logger.info('market not open...')
+                    logger.info('market not open...')
             end_time = datetime.datetime.now()
             next_start_time = datetime.datetime(start_time.year, start_time.month, start_time.day, start_time.hour,
                                                 start_time.minute, 0, ) + datetime.timedelta(minutes=1)
@@ -65,7 +80,7 @@ class StrategyRunner(object):
                 if interval > 0:
                     time.sleep(interval)
             else:
-                StrategyRunner.logger.warning('your function runs exceed 1 minutes')
+                logger.warning('your function runs exceed 1 minutes')
             start_time = next_start_time
 
     @staticmethod
