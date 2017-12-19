@@ -92,12 +92,12 @@ class StrategyRunner(object):
         if strategy_name not in StrategyRunner._running_strategies:
             StrategyRunner._running_strategies.append(strategy_name)
             StrategyRunner.init_strategy(strategy_name)
-            StrategyRunner.logger.info('run strategy %s ...' % strategy_name)
+            StrategyRunner.get_logger().info('run strategy %s ...' % strategy_name)
             # p = Process(target=StrategyRunner.listener, args=(strategy_name,))
             # p.start()
             StrategyRunner.listener(strategy_name)
         else:
-            StrategyRunner.logger.info('Strategy %s is already running...' % strategy_name)
+            StrategyRunner.get_logger().info('Strategy %s is already running...' % strategy_name)
 
 
 if __name__ == '__main__':
