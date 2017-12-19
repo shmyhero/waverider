@@ -17,14 +17,10 @@ class StrategyRunner(object):
 
     @staticmethod
     def get_logger():
-        if StrategyRunner._logger is None:
+        if StrategyRunner._logger is None or StrategyRunner._current_date != datetime.date.today():
             StrategyRunner._logger = Logger(__name__, PathMgr.get_log_path())
             StrategyRunner._current_date = datetime.date.today()
-        elif StrategyRunner._current_date == datetime.date.today():
-            return StrategyRunner._logger
-        else:
-            StrategyRunner._logger = Logger(__name__, PathMgr.get_log_path())
-            StrategyRunner._current_date = datetime.date.today()
+        return StrategyRunner._logger
 
     _running_strategies = []
 
