@@ -1,7 +1,4 @@
-from wrapi.container import schedule_function
-from wrapi.date_rules import date_rules
-from wrapi.time_rules import time_rules
-from wrapi.qutopian_functions import log
+from wrapi.quantopian import schedule_function, date_rules, time_rules, log
 
 
 def initialize(context):

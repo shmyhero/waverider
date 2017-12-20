@@ -60,19 +60,3 @@ class MarketCloseRule(TimeRule):
                 else:
                     return False
         return False
-
-
-class time_rules(object):
-
-    def __init__(self):
-        pass
-
-    @staticmethod
-    def market_open(hours=0, minutes=1):
-        return MarketOpenRule(hours, minutes)
-
-    @staticmethod
-    def market_close(hours=0, minutes=1):
-        return MarketCloseRule(hours, minutes)
-
-

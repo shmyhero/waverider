@@ -18,7 +18,9 @@ class ScheduleFunction(object):
         us_dt = datetime.datetime.now(pytz.timezone('US/Eastern'))
         delta_hour = datetime.datetime(native_dt.year, native_dt.month, native_dt.day, native_dt.hour, native_dt.minute, 0) - datetime.datetime(us_dt.year, us_dt.month, us_dt.day, us_dt.hour, us_dt.minute, 0)
         dt = current_time - delta_hour
-        # dt += datetime.timedelta(hours=13)
+        # if you want to run the strategy immediately, you would add below 2 line code, given the correct time interval.
+        # dt += datetime.timedelta(hours=13, minutes=31)
+        # print dt
         if self.date_rule.validate(dt) and self.time_rule.validate(dt):
             self.my_func()
 
@@ -76,8 +78,8 @@ class Container(object):
             Container._logger_dict[strategy_name] = Logger(strategy_name, PathMgr.get_log_path(strategy_name))
         return Container._logger_dict[strategy_name]
 
-
-def schedule_function(func, date_rule, time_rule):
-    schedule_func = ScheduleFunction(lambda: func(Container.context, Container.data), date_rule, time_rule)
-    Container.register_schedule_function(schedule_func)
+    @staticmethod
+    def schedule_function(func, date_rule, time_rule):
+        schedule_func = ScheduleFunction(lambda: func(Container.context, Container.data), date_rule, time_rule)
+        Container.register_schedule_function(schedule_func)
 

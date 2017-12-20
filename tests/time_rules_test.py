@@ -1,6 +1,6 @@
 import unittest
 import datetime
-from wrapi.time_rules import time_rules
+from wrapi.quantopian import time_rules
 
 
 class TimeRulesTest(unittest.TestCase):

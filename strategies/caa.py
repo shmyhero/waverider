@@ -1,8 +1,4 @@
-from wrapi.container import schedule_function
-from wrapi.date_rules import date_rules
-from wrapi.time_rules import time_rules
-from wrapi.qutopian_functions import symbols, log
-from wrapi.order import order_target_percent
+from wrapi.quantopian import schedule_function, date_rules, time_rules, symbols, log, order_target_percent
 import numpy as np
 import pandas as pd
 
@@ -25,7 +21,6 @@ def initialize(context):
 def handle_data(context, data):
     log.info('----------output for handle data in a strategy------------')
     log.info('spy price: %s'% data.current('SPY'))
-
 
 
 def caa_rebalance(context, data):

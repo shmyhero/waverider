@@ -130,27 +130,4 @@ class MonthEndRule(DateRule):
             return False
 
 
-class date_rules(object):
 
-    def __init__(self):
-        pass
-
-    @staticmethod
-    def every_day():
-        return EveryDayRule()
-
-    @staticmethod
-    def week_start(days_offset=0):
-        return WeekStartRule(days_offset)
-
-    @staticmethod
-    def week_end(days_offset=0):
-        return WeekEndRule(days_offset)
-
-    @staticmethod
-    def month_start(days_offset=0):
-        return MonthStartRule(days_offset)
-
-    @staticmethod
-    def month_end(days_offset=0):
-        return MonthEndRule(days_offset)
