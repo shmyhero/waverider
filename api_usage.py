@@ -30,11 +30,11 @@ if __name__ == '__main__':
     # print context.portfolio.positions['SPY'].cost_basic
     # context.abc = 1
     # print context.abc
-    data = Data()
-    print data.history('QQQ', field='close', window=100)
+    # data = Data()
+    # print data.history('QQQ', field='close', window=100)
     # print data.history(['SPY', 'VIX'], window=252)
     # print data.current(['SPY', 'VIX'])
-    StrategyRunner.run('caa')
+    # StrategyRunner.run('caa')
 
 
 
