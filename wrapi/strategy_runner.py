@@ -63,6 +63,8 @@ class StrategyRunner(object):
                         logger.error('Error: get action arguments failed:' + str(e))
                 if handle_function is not None:
                     logger.info('check handle functions...')
+                    # if you like to make handle function run every minutes, even it is not market open,
+                    # please comment out the if else codes
                     if TradeTime.is_market_open():
                         try:
                             handle_function()

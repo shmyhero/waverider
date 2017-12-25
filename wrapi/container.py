@@ -18,8 +18,9 @@ class ScheduleFunction(object):
         us_dt = datetime.datetime.now(pytz.timezone('US/Eastern'))
         delta_hour = datetime.datetime(native_dt.year, native_dt.month, native_dt.day, native_dt.hour, native_dt.minute, 0) - datetime.datetime(us_dt.year, us_dt.month, us_dt.day, us_dt.hour, us_dt.minute, 0)
         dt = current_time - delta_hour
-        # if you want to run the strategy immediately, you would add below 2 line code, given the correct time interval.
-        # dt += datetime.timedelta(hours=13, minutes=31)
+        # if you want to run the schedule function immediately,
+        # you would need to add below 2 line code, given the correct time interval.
+        # dt += datetime.timedelta(hours=12, minutes=33)
         # print dt
         if self.date_rule.validate(dt) and self.time_rule.validate(dt):
             self.my_func()

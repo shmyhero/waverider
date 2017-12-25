@@ -5,13 +5,14 @@ import pandas as pd
 
 def initialize(context):
     context.caa_tv = 0.08  # Target annual volatility
+    context.caa_total_ratio = 0.5
     # context.caa_stocks = symbols('SPY', 'QQQ',  'EFA',  'EEM',  'EWJ',  'HYG',  'IEF',  'BIL')  # N-8 Universe
     # context.caa_lower_bounds = [[0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00]]
     # context.caa_upper_bounds = [[0.25], [0.25], [0.25], [0.25], [0.25], [0.25], [1.00], [1.00]]
 
     context.caa_stocks = symbols('SSO', 'QQQ', 'EFA', 'AAXJ', 'EWJ', 'HYG', 'IEF', 'BIL')  # N-8 Universe ['SSO', 'BIL']
     context.caa_lower_bounds = [[0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00]]
-    context.caa_upper_bounds = [[0.05], [0.05], [0.05], [0.05], [0.05], [0.05], [0.05], [1.00]]
+    context.caa_upper_bounds = [[0.25], [0.25], [0.25], [0.25], [0.25], [0.25], [0.25], [1.00]]
 
     schedule_function(caa_rebalance,
                       date_rules.every_day(),
@@ -20,7 +21,7 @@ def initialize(context):
 
 def handle_data(context, data):
     log.info('----------output for handle data in a strategy------------')
-    log.info('spy price: %s'% data.current('SPY'))
+    log.info('spy price: %s'% data.history('SPY', window=1))
 
 
 def caa_rebalance(context, data):
@@ -49,7 +50,7 @@ def caa_rebalance(context, data):
             # print weights[stock]
             log.info(stock + ':\t\t' + str(round(weights[stock], 3)))
             if stock not in ['BIL']:
-                order_target_percent(stock, round(weights[stock], 3))
+                order_target_percent(stock, round(weights[stock], 3) * context.caa_total_ratio)
     except Exception as e:
         # Reset the trade date to try again on the next bar
         log.error(e)
