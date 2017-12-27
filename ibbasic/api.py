@@ -9,8 +9,6 @@ from ibbasic.portfolio import Portfolio
 
 class API(object):
 
-    ORDER_ID = 101
-
     def __init__(self):
         self.logger = Logger(__name__, PathMgr.get_log_path())
 
@@ -20,6 +18,8 @@ class API(object):
         cmd = 'python \"{}\"'.format('\" \"'.join(lst))
         self.logger.info('run command: %s'%cmd)
         output = Shell.run_cmd(cmd, True)
+        if 'errorCode=502' in output:
+            raise Exception(output)
         self.logger.info('output: %s'%output, False)
         return output
 

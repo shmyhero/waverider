@@ -128,7 +128,7 @@ if __name__ == '__main__':
     #print TradeTime.is_trade_day(datetime.date(2017, 9, 1))
     #print TradeTime.is_trade_day(datetime.date(2017, 9, 4))
     #print TradeTime.is_half_trade_day(datetime.date(2017, 7, 3))
-    print TradeTime.is_market_open(datetime.datetime(2017, 11, 6, 15, 15, 0))
+    print TradeTime.is_market_open(datetime.datetime(2017, 12, 26, 15, 15, 0))
     print TradeTime.is_market_open()
 
     t = datetime.datetime(2017, 11, 6, 15, 15, 0, tzinfo=pytz.timezone('US/Eastern'))

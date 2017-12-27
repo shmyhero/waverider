@@ -1,6 +1,7 @@
 from wrapi.quantopian import schedule_function, date_rules, time_rules, symbols, log, order_target_percent
 import numpy as np
 import pandas as pd
+import traceback
 
 
 def initialize(context):
@@ -50,10 +51,13 @@ def caa_rebalance(context, data):
             # print weights[stock]
             log.info(stock + ':\t\t' + str(round(weights[stock], 3)))
             if stock not in ['BIL']:
-                order_target_percent(stock, round(weights[stock], 3) * context.caa_total_ratio)
+                percent = round(weights[stock], 3) * context.caa_total_ratio
+                log.info('order_target_percent {} {}'.format(stock, percent))
+                order_target_percent(stock, percent)
     except Exception as e:
         # Reset the trade date to try again on the next bar
-        log.error(e)
+        log.error('Trace: ' + traceback.format_exc(), False)
+        log.error(str(e))
 
 
 def getWeights(cla, tv):
