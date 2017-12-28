@@ -56,7 +56,7 @@ def caa_rebalance(context, data):
                 order_target_percent(stock, percent)
     except Exception as e:
         # Reset the trade date to try again on the next bar
-        log.error('Trace: ' + traceback.format_exc(), False)
+        log.error('Trace: ' + traceback.format_exc())
         log.error(str(e))
 
 
