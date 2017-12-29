@@ -27,8 +27,10 @@ class Order(object):
         [order_type, price] = style
         if amount > 0:
             return API().order(asset, sec_type, order_type, amount, 'BUY', price)
-        else:
+        elif amount < 0:
             return API().order(asset, sec_type, order_type, -amount, 'SELL', price)
+        else:
+            pass
 
     @staticmethod
     def order_target_percent(asset, percent, style=OrderStyle.MarketOrder, sec_type = 'STK'):
