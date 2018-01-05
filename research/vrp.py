@@ -80,6 +80,7 @@ class VRP(object):
 
 
 if __name__ == '__main__':
-    VRP(10).run(8)
+    #VRP(10).run(8)
+    VRP().run(8)
 
 

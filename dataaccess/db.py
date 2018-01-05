@@ -60,3 +60,13 @@ class YahooEquityDAO(BaseDAO):
         rows = self.select(query)
         return rows
 
+    def get_equity_monthly_price_by_symbol(self, symbol, from_date_str='1993-01-01', price_field = 'adjClosePrice'):
+        """
+        :param symbol: eg: SPY
+        :return: rows
+        """
+        query_template = """select lastdate, {} from yahoo_equity_monthly_view where symbol = '{}'"""
+        query = query_template.format(price_field, symbol)
+        rows = self.select(query)
+        return rows
+
