@@ -45,8 +45,8 @@ class VRP(object):
                     trade_nodes.append(TradeNode('VXX', date, 'buy'))
                     previous_condition = False
         returns = list(TradeSimulation.simulate(trade_nodes, dates[0]))
-        # for trade_node in trade_nodes:
-        #    print trade_node
+        for trade_node in trade_nodes:
+           print trade_node
         return returns
 
     def plot(self, returns):

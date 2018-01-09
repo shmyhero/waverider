@@ -2,7 +2,7 @@ import datetime
 import time
 import importlib
 import traceback
-from utils.logger import Logger
+from utils.logger import Logger, DailyLoggerFactory
 from common.pathmgr import PathMgr
 from common.tradetime import TradeTime
 from wrapi.container import Container
@@ -12,19 +12,9 @@ class StrategyRunner(object):
 
     _running_strategies = []
 
-    _logger = None
-
-    _current_date = datetime.date.today()
-
     @staticmethod
     def get_logger():
-        if StrategyRunner._logger is None or StrategyRunner._current_date != datetime.date.today():
-            StrategyRunner._logger = Logger(__name__, PathMgr.get_log_path())
-            StrategyRunner._current_date = datetime.date.today()
-            return StrategyRunner._logger
-        else:
-            return StrategyRunner._logger
-
+        return DailyLoggerFactory.get_logger(__name__, PathMgr.get_log_path())
 
     @staticmethod
     def init_strategy(strategy_name):

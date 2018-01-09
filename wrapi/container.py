@@ -1,6 +1,6 @@
 import datetime
 import pytz
-from utils.logger import Logger
+from utils.logger import Logger, DailyLoggerFactory
 from common.pathmgr import PathMgr
 from wrapi.context import Context
 from wrapi.data import Data
@@ -76,7 +76,7 @@ class Container(object):
     @staticmethod
     def get_logger(strategy_name):
         if strategy_name not in Container._logger_dict.keys():
-            Container._logger_dict[strategy_name] = Logger(strategy_name, PathMgr.get_log_path(strategy_name))
+            Container._logger_dict[strategy_name] = DailyLoggerFactory.get_logger(strategy_name, PathMgr.get_log_path(strategy_name))
         return Container._logger_dict[strategy_name]
 
     @staticmethod

@@ -127,5 +127,5 @@ class MarketWatchScraper(WebScraper):
 if __name__ == '__main__':
     #print YahooScraper().get_current_data(['SPX', 'SPY'])
     #print YahooScraper().get_current_data(['YM=F', 'ES=F'])
-    print BarChartScraper().get_current_data(['SPY', 'QQQ'])
+    print BarChartScraper().get_current_data(['XIV', 'SVXY'])
     #print MarketWatchScraper().get_current_data(['DJI', 'SPX'])
