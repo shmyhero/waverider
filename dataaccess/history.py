@@ -20,7 +20,7 @@ class DBProvider(AbstractHistoricalDataProvider):
 
     def history(self, symbol, field, window):
         fields_dic = {'open': 'openPrice', 'close': 'adjclosePrice', 'high': 'highPrice', 'low': 'lowPrice',
-                      'price': 'adjclosePrice'}
+                      'price': 'adjclosePrice', 'unadj':'closePrice'}
         fields = fields_dic.keys()
         if field.lower() not in field:
             raise Exception('the field should be in %s...'%fields)

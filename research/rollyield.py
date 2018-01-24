@@ -1,4 +1,6 @@
 import datetime
+import talib
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from dataaccess.db import YahooEquityDAO
@@ -49,6 +51,19 @@ class RollYield(object):
     def run1(self, ma_window = 7, print_trade_node=True):
         returns = self.get_returns(self.condition1, ma_window, print_trade_node)
         self.plot(returns)
+
+    def run_with_return_ma(self, ma_window = 7, return_ma = 20, print_trade_node=True):
+        returns = self.get_returns(self.condition1, ma_window, print_trade_node)
+        dates = map(lambda x: x[0], returns)
+        values1 = map(lambda x: x[1], returns)
+        ma_values = talib.SMA(np.asarray(values1), return_ma)
+        fig, ax = plt.subplots()
+        ax.set_yscale('log')
+        ax.plot(dates, values1, 'r-', label='return')
+        ax.plot(dates, ma_values, 'b-', label='ma%s' % return_ma)
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=8, borderaxespad=0.)
+        plt.show()
+
 
     def run(self, ma_window = 7):
         returns1 = self.get_returns(self.condition1, ma_window)
@@ -108,7 +123,8 @@ class RollYield(object):
 
 
 if __name__ == '__main__':
-    RollYield().run1(7)
+    # RollYield().run1(7)
+    RollYield().run_with_return_ma(return_ma=252)
     #RollYield().run1(5)
     # RollYield().plot_xiv_vxx()
     # RollYield().plot_vxv_vix()
