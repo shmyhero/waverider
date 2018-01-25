@@ -21,13 +21,16 @@ class Data(object):
         :param frequency: this parameter used for compatible with quantopian algorithm.
         :return:
         """
-        frequency = '1d'
         if hasattr(assets, '__iter__'):
             results = None
             columns = ['date']
             for symbol in assets:
                 columns.append(symbol)
-                rows = self.historical_data_provider.history(symbol, field, window)
+                if frequency == 'id':
+                    rows = self.historical_data_provider.history(symbol, field, window)
+                elif frequency == '1m':
+                    columns[0] = 'minute'
+                    rows = self.historical_data_provider.history_min(symbol, window)
                 if results is None:
                     results = map(list, rows)
                 else:
@@ -36,7 +39,10 @@ class Data(object):
             return df
         else:
             symbol = str(assets)
-            rows = self.historical_data_provider.history(symbol, field, window)
+            if frequency == 'id':
+                rows = self.historical_data_provider.history(symbol, field, window)
+            elif frequency == '1m':
+                rows = self.historical_data_provider.history_min(symbol, window)
             df = pd.DataFrame(map(lambda x: x[1:], rows), index=map(lambda x: x[0], rows), columns = ['price'])
             return df
 
@@ -57,10 +63,10 @@ class Data(object):
             return None
 
 
-
 if __name__ == '__main__':
     data = Data()
-    print data.history('QQQ', field='close', window=100)
+    # print data.history('QQQ', field='close', window=100)
+    print data.history('XIV', window=1000, frequency='1m')
     # print data.history('SPX')
     #print data.history(['SPY', 'VIX'], window=252)
     # print data.current(['SPY', 'QQQ', 'VIX', 'NDX'])

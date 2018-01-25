@@ -1,5 +1,5 @@
 import traceback
-
+import datetime
 import mysql.connector
 from utils.logger import Logger
 from common.pathmgr import PathMgr
@@ -69,4 +69,19 @@ class YahooEquityDAO(BaseDAO):
         query = query_template.format(price_field, symbol)
         rows = self.select(query)
         return rows
+
+    def get_realtime_time_and_price(self, symbol='XIV', start_time=datetime.datetime(1971, 1, 1, 0, 0, 0), end_time=datetime.datetime(9999, 1, 1, 0, 0, 0)):
+        query = """select tradeTime, price from equity_realtime where tradeTime >= '{}' and tradeTime <= '{}' and symbol = '{}' order by tradeTime """.format(start_time, end_time, symbol)
+        return self.select(query)
+
+    def get_min_time_and_price(self, symbol='XIV', start_time=datetime.datetime(1971, 1, 1, 0, 0, 0), end_time=datetime.datetime(9999, 1, 1, 0, 0, 0)):
+        rows = self.get_realtime_time_and_price(symbol, start_time, end_time)
+        new_rows = []
+        last_min = -1
+        for row in rows:
+            trade_time = row[0]
+            if last_min != trade_time.minute:
+                last_min = trade_time.minute
+                new_rows.append(row)
+        return new_rows
 
