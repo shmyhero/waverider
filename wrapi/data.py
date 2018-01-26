@@ -66,7 +66,9 @@ class Data(object):
 if __name__ == '__main__':
     data = Data()
     # print data.history('QQQ', field='close', window=100)
-    print data.history('XIV', window=1000, frequency='1m')
+    dt = data.history('XIV', window=2000, frequency='1m')
+    print dt
+    # print dt.resample('30T').last()
     # print data.history('SPX')
     #print data.history(['SPY', 'VIX'], window=252)
     # print data.current(['SPY', 'QQQ', 'VIX', 'NDX'])
