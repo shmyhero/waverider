@@ -8,8 +8,8 @@ from research.tradesimulation import TradeNode, TradeSimulation
 class RollYield(object):
 
     def __init__(self):
-        self.vix_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VIX', from_date_str='2010-12-17')
-        self.vxv_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VXV', from_date_str='2010-12-17')
+        self.vix_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VIX', from_date_str='2006-07-17')
+        self.vxv_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VXV', from_date_str='2006-07-17')
         self.vix_values = map(lambda x: x[1], self.vix_records)
         self.vxv_values = map(lambda x: x[1], self.vxv_records)
 

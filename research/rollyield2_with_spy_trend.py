@@ -10,8 +10,8 @@ class RollYield(object):
     def __init__(self):
         self.spy_monthly_records = YahooEquityDAO().get_equity_monthly_price_by_symbol('SPY')
         self.spy_monthly_indicator = self.get_spy_monthly_indicator()
-        self.vix_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VIX', from_date_str='2010-12-17')
-        self.vxv_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VXV', from_date_str='2010-12-17')
+        self.vix_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VIX', from_date_str='2006-07-17')
+        self.vxv_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VXV', from_date_str='2006-07-17')
         self.vix_values = map(lambda x: x[1], self.vix_records)
         self.vxv_values = map(lambda x: x[1], self.vxv_records)
 
@@ -25,7 +25,7 @@ class RollYield(object):
         return bull_p
 
     def get_spy_monthly_indicator(self):
-        ma_monthly_window = 8
+        ma_monthly_window = 10
         spy_values = map(lambda x: x[1], self.spy_monthly_records)
         spy_ma = pd.Series(spy_values).rolling(window=ma_monthly_window).mean().tolist()[ma_monthly_window:]
         return map(lambda x, y: [x[0], x[1] > y], self.spy_monthly_records[ma_monthly_window:], spy_ma)

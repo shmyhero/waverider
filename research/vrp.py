@@ -10,7 +10,7 @@ class VRP(object):
 
     """Volatility risk premium """
     def __init__(self, vol_circle=10):
-        from_date_str = '2010-11-30'
+        from_date_str = '2006-07-17'
         spy_records = YahooEquityDAO().get_all_equity_price_by_symbol('SPY', from_date_str)
         self.vol_list = OptionCalculator.get_year_history_volatility_list(spy_records, vol_circle)
         self.vix_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VIX', from_date_str)[vol_circle:]
