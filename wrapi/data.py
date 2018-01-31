@@ -26,7 +26,7 @@ class Data(object):
             columns = ['date']
             for symbol in assets:
                 columns.append(symbol)
-                if frequency == 'id':
+                if frequency == '1d':
                     rows = self.historical_data_provider.history(symbol, field, window)
                 elif frequency == '1m':
                     columns[0] = 'minute'
@@ -39,7 +39,7 @@ class Data(object):
             return df
         else:
             symbol = str(assets)
-            if frequency == 'id':
+            if frequency == '1d':
                 rows = self.historical_data_provider.history(symbol, field, window)
             elif frequency == '1m':
                 rows = self.historical_data_provider.history_min(symbol, window)
@@ -66,9 +66,9 @@ class Data(object):
 if __name__ == '__main__':
     data = Data()
     # print data.history('QQQ', field='close', window=100)
-    dt = data.history('XIV', window=2000, frequency='1m')
+    dt = data.history('XIV', window=200, frequency='1m')
     print dt
-    # print dt.resample('30T').last()
+    print dt.resample('30T').last()
     # print data.history('SPX')
     #print data.history(['SPY', 'VIX'], window=252)
     # print data.current(['SPY', 'QQQ', 'VIX', 'NDX'])

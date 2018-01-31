@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # context.abc = 1
     # print context.abc
     data = Data()
-    print data.history('QQQ',  window=1)
+    print data.history('QQQ',  window=1, frequency='1d')
     # print data.history(['SPY', 'VIX'], window=252)
     # print data.current(['SPY', 'VIX'])
     # StrategyRunner.run('caa')
