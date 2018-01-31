@@ -2,6 +2,7 @@ import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
 from utils.optioncalculator import OptionCalculator
+from utils.backtesthelper import BackTestHelper
 from dataaccess.db import YahooEquityDAO
 from research.tradesimulation import TradeNode, TradeSimulation
 
@@ -46,7 +47,9 @@ class VRP(object):
                     previous_condition = False
         returns = list(TradeSimulation.simulate(trade_nodes, dates[0]))
         for trade_node in trade_nodes:
-           print trade_node
+            print trade_node
+        max_draw_down = BackTestHelper.get_max_draw_down(map(lambda x: x[1], returns))
+        print 'Max draw down: %s' % max_draw_down
         return returns
 
     def plot(self, returns):

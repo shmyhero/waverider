@@ -3,6 +3,7 @@ import talib
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from utils.backtesthelper import BackTestHelper
 from dataaccess.db import YahooEquityDAO
 from research.tradesimulation import TradeNode, TradeSimulation
 
@@ -12,12 +13,15 @@ class RollYield(object):
     def __init__(self):
         self.vix_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VIX', from_date_str='2006-07-17')
         self.vxv_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VXV', from_date_str='2006-07-17')
+        # self.vix_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VIX', from_date_str='2010-01-01')
+        # self.vxv_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VXV', from_date_str='2010-01-01')
         self.vix_values = map(lambda x: x[1], self.vix_records)
         self.vxv_values = map(lambda x: x[1], self.vxv_records)
 
     def condition1(self, ma_window):
         vxv_ma = pd.Series(self.vxv_values).rolling(window=ma_window).mean().tolist()[ma_window:]
         vix_ma = pd.Series(self.vix_values).rolling(window=ma_window).mean().tolist()[ma_window:]
+        # return map(lambda x, y: x > y*0.99, vxv_ma, vix_ma)
         return map(lambda x, y: x > y, vxv_ma, vix_ma)
 
     def condition2(self, ma_window):
@@ -46,6 +50,8 @@ class RollYield(object):
         if print_trade_node:
             for trade_node in trade_nodes:
                 print trade_node
+            max_draw_down = BackTestHelper.get_max_draw_down(map(lambda x: x[1], returns))
+            print 'Max drawdown: %s' % max_draw_down
         return returns
 
     def run1(self, ma_window = 7, print_trade_node=True):
