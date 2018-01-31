@@ -51,6 +51,7 @@ class RollYield(object):
             for trade_node in trade_nodes:
                 print trade_node
             max_draw_down = BackTestHelper.get_max_draw_down(map(lambda x: x[1], returns))
+            print 'total return: %s' % returns[-1][1]
             print 'Max drawdown: %s' % max_draw_down
         return returns
 
