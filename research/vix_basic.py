@@ -79,6 +79,19 @@ class VIXBasic(object):
         plt.legend(bbox_to_anchor=(1.05, 1), loc=8, borderaxespad=0.)
         plt.show()
 
+    def plot_z_score(self, ma_window_short=7, ma_window_long=20):
+        rate = map(lambda x, y: x / y, self.vxv_values, self.vix_values)
+        rate_ma_short = pd.Series(rate).rolling(window=ma_window_short).mean().tolist()
+        rate_ma_long = pd.Series(rate).rolling(window=ma_window_long).mean().tolist()
+        rate_std = pd.Series(rate).rolling(window=ma_window_long).std().tolist()
+        zscore = map(lambda x, y, z: (x - y) / z, rate_ma_short[ma_window_long:], rate_ma_long[ma_window_long:],
+                     rate_std[ma_window_long:])
+        dates = map(lambda x: x[0], self.vxv_records)[ma_window_long:]
+        fig, ax = plt.subplots()
+        ax.plot(dates, zscore, label='zscore')
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=8, borderaxespad=0.)
+        plt.show()
+
 if __name__ == '__main__':
     # VIXBasic().plot_xiv_vxx()
     # VIXBasic().plot_2symbol('vxv', 'vix')
@@ -88,8 +101,9 @@ if __name__ == '__main__':
     # VIXBasic().plot_symbol('^VIX')
     # VIXBasic().plot_symbol('SPY')
     # VIXBasic().plot_symbol('XIV')
-    VIXBasic().plot_symbol('VXX')
+    # VIXBasic().plot_symbol('VXX')
     # VIXBasic().plot_symbol_with_ma('SPY', 20)
+    VIXBasic().plot_z_score()
 
 
 
