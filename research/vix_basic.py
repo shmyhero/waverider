@@ -92,6 +92,23 @@ class VIXBasic(object):
         plt.legend(bbox_to_anchor=(1.05, 1), loc=8, borderaxespad=0.)
         plt.show()
 
+    def plot_z_score_with_xiv(self, ma_window_short=7, ma_window_long=20):
+        rate = map(lambda x, y: x / y, self.vxv_values, self.vix_values)
+        rate_ma_short = pd.Series(rate).rolling(window=ma_window_short).mean().tolist()
+        rate_ma_long = pd.Series(rate).rolling(window=ma_window_long).mean().tolist()
+        rate_std = pd.Series(rate).rolling(window=ma_window_long).std().tolist()
+        zscore = map(lambda x, y, z: (x - y) / z, rate_ma_short[ma_window_long:], rate_ma_long[ma_window_long:],
+                     rate_std[ma_window_long:])
+        dates = map(lambda x: x[0], self.vxv_records)[ma_window_long:]
+        xiv_records = YahooEquityDAO().get_all_equity_price_by_symbol('XIV', from_date_str='2006-07-17')
+        xiv_values = map(lambda x: x[1], xiv_records[ma_window_long:])
+        fig, ax1 = plt.subplots()
+        ax2 = ax1.twinx()
+        ax1.plot(dates, zscore, 'r-', label='z score')
+        ax2.plot(dates, xiv_values, 'b-', label='xiv')
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=8, borderaxespad=0.)
+        plt.show()
+
 if __name__ == '__main__':
     # VIXBasic().plot_xiv_vxx()
     # VIXBasic().plot_2symbol('vxv', 'vix')
@@ -103,8 +120,8 @@ if __name__ == '__main__':
     # VIXBasic().plot_symbol('XIV')
     # VIXBasic().plot_symbol('VXX')
     # VIXBasic().plot_symbol_with_ma('SPY', 20)
-    VIXBasic().plot_z_score()
-
+    # VIXBasic().plot_z_score()
+    VIXBasic().plot_z_score_with_xiv()
 
 
 
