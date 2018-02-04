@@ -37,11 +37,21 @@ class VIXBasic(object):
         plt.legend(bbox_to_anchor=(1.05, 1), loc=8, borderaxespad=0.)
         plt.show()
 
-    def plot_vxv_vix(self):
+    def plot_vxv_minus_vix(self):
         fig, ax = plt.subplots()
         dates = map(lambda x: x[0], self.vix_records)
-        ax.plot(dates, self.vxv_values, 'r-', label='vxv')
-        ax.plot(dates, self.vix_values, 'b-', label='vix')
+        values = map(lambda x, y: x - y, self.vxv_values, self.vix_values)
+        ax.plot(dates, values, 'r-', label='vxv-vix')
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=8, borderaxespad=0.)
+        plt.show()
+
+    def plot_vxv_ma_minus_vix_ma(self, ma_window):
+        fig, ax = plt.subplots()
+        dates = map(lambda x: x[0], self.vix_records)[ma_window:]
+        vxv_ma = pd.Series(self.vxv_values).rolling(window=ma_window).mean().tolist()[ma_window:]
+        vix_ma = pd.Series(self.vix_values).rolling(window=ma_window).mean().tolist()[ma_window:]
+        values =  map(lambda x, y: x - y, vxv_ma, vix_ma)
+        ax.plot(dates, values, 'r-', label='vxv_ma-vix_ma, ma=%s' % ma_window)
         plt.legend(bbox_to_anchor=(1.05, 1), loc=8, borderaxespad=0.)
         plt.show()
 
@@ -111,7 +121,7 @@ class VIXBasic(object):
 
 if __name__ == '__main__':
     # VIXBasic().plot_xiv_vxx()
-    # VIXBasic().plot_2symbol('vxv', 'vix')
+    # VIXBasic().plot_2symbol('^VXV', '^VIX')
     # VIXBasic().plot_2symbol('vxmt', 'vxv')
     # VIXBasic().p
     # lot_symbol('VXX')
@@ -122,6 +132,8 @@ if __name__ == '__main__':
     # VIXBasic().plot_symbol_with_ma('SPY', 20)
     # VIXBasic().plot_z_score()
     VIXBasic().plot_z_score_with_xiv()
+    # VIXBasic().plot_vxv_minus_vix()
+    # VIXBasic().plot_vxv_ma_minus_vix_ma(7)
 
 
 
