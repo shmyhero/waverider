@@ -41,7 +41,10 @@ class VIXBasic(object):
         fig, ax = plt.subplots()
         dates = map(lambda x: x[0], self.vix_records)
         values = map(lambda x, y: x - y, self.vxv_values, self.vix_values)
+        xiv_records = YahooEquityDAO().get_all_equity_price_by_symbol('XIV', from_date_str='2006-07-17')
+        xiv_values = map(lambda x: x[1], xiv_records)
         ax.plot(dates, values, 'r-', label='vxv-vix')
+        ax.plot(dates, xiv_values, 'b-', label='xiv')
         plt.legend(bbox_to_anchor=(1.05, 1), loc=8, borderaxespad=0.)
         plt.show()
 
@@ -51,7 +54,10 @@ class VIXBasic(object):
         vxv_ma = pd.Series(self.vxv_values).rolling(window=ma_window).mean().tolist()[ma_window:]
         vix_ma = pd.Series(self.vix_values).rolling(window=ma_window).mean().tolist()[ma_window:]
         values =  map(lambda x, y: x - y, vxv_ma, vix_ma)
+        xiv_records = YahooEquityDAO().get_all_equity_price_by_symbol('XIV', from_date_str='2006-07-17')
+        xiv_values = map(lambda x: x[1], xiv_records)[ma_window:]
         ax.plot(dates, values, 'r-', label='vxv_ma-vix_ma, ma=%s' % ma_window)
+        ax.plot(dates, xiv_values, 'b-', label='xiv')
         plt.legend(bbox_to_anchor=(1.05, 1), loc=8, borderaxespad=0.)
         plt.show()
 
@@ -131,8 +137,8 @@ if __name__ == '__main__':
     # VIXBasic().plot_symbol('VXX')
     # VIXBasic().plot_symbol_with_ma('SPY', 20)
     # VIXBasic().plot_z_score()
-    VIXBasic().plot_z_score_with_xiv()
-    # VIXBasic().plot_vxv_minus_vix()
+    # VIXBasic().plot_z_score_with_xiv()
+    VIXBasic().plot_vxv_minus_vix()
     # VIXBasic().plot_vxv_ma_minus_vix_ma(7)
 
 
