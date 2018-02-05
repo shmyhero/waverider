@@ -118,7 +118,8 @@ class TradeTime(object):
                 return current_date
             current_date -= datetime.timedelta(days=1)
             if TradeTime.is_trade_day(current_date):
-                count +=1
+                if not TradeTime.is_half_trade_day(current_date):
+                    count +=1
 
 
 if __name__ == '__main__':

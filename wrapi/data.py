@@ -66,7 +66,7 @@ class Data(object):
 if __name__ == '__main__':
     data = Data()
     # print data.history('QQQ', field='close', window=100)
-    dt = data.history('XIV', window=200, frequency='1m')
+    dt = data.history('XIV', window=1000, frequency='1m')
     print dt
     print dt.resample('30T').last()
     # print data.history('SPX')
