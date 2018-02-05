@@ -35,11 +35,13 @@ class Momentum(object):
             date = dates[i]
             if conditions[i]:
                 if previous_condition is False:
+                    # trade_nodes.append(TradeNode('VXX', date, 'sell'))
                     trade_nodes.append(TradeNode('XIV', date, 'buy'))
                     previous_condition = True
             else:
                 if previous_condition is True:
                     trade_nodes.append(TradeNode('XIV', date, 'sell'))
+                    # trade_nodes.append(TradeNode('VXX', date, 'buy'))
                     previous_condition = False
         returns = list(TradeSimulation.simulate(trade_nodes, dates[0]))
         if print_trade_node:
@@ -50,10 +52,23 @@ class Momentum(object):
             print 'Max drawdown: %s' % max_draw_down
         return returns
 
+    def run1(self):
+        returns = self.get_returns(10, True)
+        self.plot_for_returns(returns)
+
     def run(self):
         windows = map(lambda x: x+1, range(99))
         return_values = map(lambda x: self.get_returns(x)[-1][1], windows)
         self.plot(windows, return_values)
+
+    def plot_for_returns(self, returns):
+        fig, ax = plt.subplots()
+        dates = map(lambda x: x[0], returns)
+        values = map(lambda x: x[1], returns)
+        ax.plot(dates, values)
+        lines, labels = ax.get_legend_handles_labels()
+        ax.legend(lines[:2], labels[:2])
+        plt.show()
 
     def plot(self, X, Y):
         fig, ax = plt.subplots()
@@ -64,12 +79,8 @@ class Momentum(object):
 
 
 if __name__ == '__main__':
-    Momentum().run()
-    # RollYield().run_with_return_ma(return_ma=252)
-    #RollYield().run1(5)
-    # RollYield().plot_xiv_vxx()
-    # RollYield().plot_vxv_vix()
-    # RollYield().plot_vxx()
+    Momentum().run1()
+    # Momentum().run()
 
 
 

@@ -3,6 +3,7 @@ import talib
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from utils.backtesthelper import BackTestHelper
 from dataaccess.db import YahooEquityDAO
 from research.tradesimulation import TradeNode, TradeSimulation
 
@@ -10,8 +11,8 @@ from research.tradesimulation import TradeNode, TradeSimulation
 class RollYield(object):
 
     def __init__(self):
-        self.vix_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VXV', from_date_str='2006-07-17')
-        self.vxv_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VXMT', from_date_str='2006-07-17')
+        self.vix_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VXV', from_date_str='2010-12-1')
+        self.vxv_records = YahooEquityDAO().get_all_equity_price_by_symbol('^VXMT', from_date_str='2010-12-1')
         self.vix_values = map(lambda x: x[1], self.vix_records)
         self.vxv_values = map(lambda x: x[1], self.vxv_records)
 
@@ -34,18 +35,25 @@ class RollYield(object):
             date = dates[i]
             if conditions[i]:
                 if previous_condition is False:
-                    trade_nodes.append(TradeNode('VXX', date, 'sell'))
-                    trade_nodes.append(TradeNode('XIV', date, 'buy'))
+                    # trade_nodes.append(TradeNode('VXX', date, 'sell'))
+                    # trade_nodes.append(TradeNode('XIV', date, 'buy'))
+                    trade_nodes.append(TradeNode('VXZ', date, 'sell'))
+                    trade_nodes.append(TradeNode('ZIV', date, 'buy'))
                     previous_condition = True
             else:
                 if previous_condition is True:
-                    trade_nodes.append(TradeNode('XIV', date, 'sell'))
-                    trade_nodes.append(TradeNode('VXX', date, 'buy'))
+                    # trade_nodes.append(TradeNode('XIV', date, 'sell'))
+                    # trade_nodes.append(TradeNode('VXX', date, 'buy'))
+                    trade_nodes.append(TradeNode('ZIV', date, 'sell'))
+                    trade_nodes.append(TradeNode('VXZ', date, 'buy'))
                     previous_condition = False
         returns = list(TradeSimulation.simulate(trade_nodes, dates[0]))
         if print_trade_node:
             for trade_node in trade_nodes:
                 print trade_node
+            max_draw_down = BackTestHelper.get_max_draw_down(map(lambda x: x[1], returns))
+            print 'total return: %s' % returns[-1][1]
+            print 'Max drawdown: %s' % max_draw_down
         return returns
 
     def run1(self, ma_window = 7, print_trade_node=True):

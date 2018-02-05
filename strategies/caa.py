@@ -17,7 +17,7 @@ def initialize(context):
 
     schedule_function(caa_rebalance,
                       date_rules.every_day(),
-                      time_rules.market_close(minutes=15))
+                      time_rules.market_open(minutes=5))
 
 
 def handle_data(context, data):

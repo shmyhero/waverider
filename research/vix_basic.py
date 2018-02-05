@@ -25,10 +25,10 @@ class VIXBasic(object):
         rate_ma = pd.Series(rate).rolling(window=ma_window).mean().tolist()[ma_window:]
         return map(lambda x: x > 1, rate_ma)
 
-    def plot_2symbol(self, symbol1, symbol2):
+    def plot_2symbol(self, symbol1, symbol2, from_date_str='2006-07-17'):
         fig, ax = plt.subplots()
-        records1 = YahooEquityDAO().get_all_equity_price_by_symbol(symbol1, from_date_str='2006-07-17')
-        records2 = YahooEquityDAO().get_all_equity_price_by_symbol(symbol2, from_date_str='2006-07-17')
+        records1 = YahooEquityDAO().get_all_equity_price_by_symbol(symbol1, from_date_str=from_date_str)
+        records2 = YahooEquityDAO().get_all_equity_price_by_symbol(symbol2, from_date_str=from_date_str)
         values1 = map(lambda x: x[1], records1)
         values2 = map(lambda x: x[1], records2)
         dates = map(lambda x: x[0], records1)
@@ -128,17 +128,18 @@ class VIXBasic(object):
 if __name__ == '__main__':
     # VIXBasic().plot_xiv_vxx()
     # VIXBasic().plot_2symbol('^VXV', '^VIX')
-    # VIXBasic().plot_2symbol('vxmt', 'vxv')
+    # VIXBasic().plot_2symbol('^VXMT', '^VXV', '2008-01-07')
     # VIXBasic().p
     # lot_symbol('VXX')
     # VIXBasic().plot_symbol('^VIX')
+    VIXBasic().plot_symbol('XIV')
     # VIXBasic().plot_symbol('SPY')
     # VIXBasic().plot_symbol('XIV')
     # VIXBasic().plot_symbol('VXX')
     # VIXBasic().plot_symbol_with_ma('SPY', 20)
     # VIXBasic().plot_z_score()
     # VIXBasic().plot_z_score_with_xiv()
-    VIXBasic().plot_vxv_minus_vix()
+    # VIXBasic().plot_vxv_minus_vix()
     # VIXBasic().plot_vxv_ma_minus_vix_ma(7)
 
 
