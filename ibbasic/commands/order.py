@@ -79,7 +79,7 @@ def main(order_id, symbol, sec_type, order_type, quantity, action, price = None)
     # Use the connection to the send the order to IB
     tws_conn.placeOrder(order_id, contract, order)
 
-    time.sleep(1)
+    time.sleep(3)
     # Disconnect from TWS
     tws_conn.disconnect()
 

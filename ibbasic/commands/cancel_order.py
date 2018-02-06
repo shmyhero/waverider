@@ -36,7 +36,7 @@ def main(order_id):
 
     tws_conn.cancelOrder(order_id)
 
-    time.sleep(2)
+    time.sleep(3)
 
     # Disconnect from TWS
     tws_conn.disconnect()

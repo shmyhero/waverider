@@ -21,8 +21,10 @@ def initialize(context):
 
 
 def handle_data(context, data):
-    log.info('----------output for handle data in a strategy------------')
-    log.info('spy price: %s'% data.history('SPY', window=1))
+    log.info('----------output for handle data in caa strategy------------')
+    log.info('SPX price: %s' % data.current('SPX'))
+    log.info('XIV price: %s' % data.current('XIV'))
+    log.info('XIV minutes: %s' % data.history('XIV', frequency='1m').tail(1))
 
 
 def caa_rebalance(context, data):

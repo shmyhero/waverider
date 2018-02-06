@@ -33,7 +33,13 @@ class StrategyRunner(object):
         logger.info('initialize strategy %s completed.' % strategy_name, False)
 
     @staticmethod
-    def listener(strategy_name):
+    def listener(strategy_name, market_open_only=True):
+        """
+        :param strategy_name:
+        :param market_open_only:
+          if you want handle function run every minutes, even if the market is not open, give it false.
+        :return:
+        """
         schedule_functions = Container.get_schedule_functions(strategy_name)
         handle_function = Container.get_handle_function(strategy_name)
         last_minute = datetime.datetime.now().minute-1
@@ -53,9 +59,7 @@ class StrategyRunner(object):
                         logger.error('Error: get action arguments failed:' + str(e))
                 if handle_function is not None:
                     logger.info('check handle functions...')
-                    # if you like to make handle function run every minutes, even it is not market open,
-                    # please comment out the if else codes
-                    if TradeTime.is_market_open():
+                    if market_open_only is False or TradeTime.is_market_open():
                         try:
                             handle_function()
                         except Exception as e:
@@ -83,6 +87,8 @@ class StrategyRunner(object):
             # p = Process(target=StrategyRunner.listener, args=(strategy_name,))
             # p.start()
             StrategyRunner.listener(strategy_name)
+            # if you want handle function run every minutes, even if the market is not open, give it false.
+            # StrategyRunner.listener(strategy_name, False)
         else:
             StrategyRunner.get_logger().info('Strategy %s is already running...' % strategy_name)
 

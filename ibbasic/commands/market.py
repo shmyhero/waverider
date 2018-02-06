@@ -37,7 +37,7 @@ def get_market_value(symbol, sec_type, exchange, currency, expiry, strike, right
     contract.m_right = right
     print ('* * * * REQUESTING MARKET DATA * * * *')
     con.reqMktData(tickId, contract, '', False)
-    sleep(2)
+    sleep(3)
     print ('* * * * CANCELING MARKET DATA * * * *')
     con.cancelMktData(tickId)
     sleep(1)
