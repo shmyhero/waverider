@@ -55,6 +55,10 @@ class Portfolio(object):
         return sum(map(lambda x: x.value, self.positions.values()))
 
     @property
+    def positions_amounts(self):
+        return map(lambda x: [x.symbol, x.amount], self.positions.values())
+
+    @property
     def capital_used(self):
         return sum(map(lambda x: x.cost, self.positions.values()))
 

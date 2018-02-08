@@ -38,8 +38,6 @@ class Container(object):
 
     _handle_data_dic = {}
 
-    _logger_dict = {}
-
     @staticmethod
     def set_current_strategy(strategy_name):
         Container.current_strategy = strategy_name
@@ -75,9 +73,7 @@ class Container(object):
 
     @staticmethod
     def get_logger(strategy_name):
-        if strategy_name not in Container._logger_dict.keys():
-            Container._logger_dict[strategy_name] = DailyLoggerFactory.get_logger(strategy_name, PathMgr.get_log_path(strategy_name))
-        return Container._logger_dict[strategy_name]
+        return DailyLoggerFactory.get_logger(strategy_name, PathMgr.get_log_path(strategy_name))
 
     @staticmethod
     def schedule_function(func, date_rule, time_rule):

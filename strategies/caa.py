@@ -19,12 +19,20 @@ def initialize(context):
                       date_rules.every_day(),
                       time_rules.market_open(minutes=5))
 
+    schedule_function(display_all,
+                      date_rules.every_day(),
+                      time_rules.market_open(minutes=0))
+
 
 def handle_data(context, data):
-    log.info('----------output for handle data in caa strategy------------')
-    log.info('SPX price: %s' % data.current('SPX'))
-    log.info('XIV price: %s' % data.current('XIV'))
-    log.info('XIV minutes: %s' % data.history('XIV', frequency='1m').tail(1))
+    log.info('SPX price:%s;  SVXY price:%s' % (data.current('SPX'), data.current('SVXY')))
+
+
+def display_all(context, data):
+    log.info('portfolio value:%s' % context.portfolio.portfolio_value)
+    log.info('position value: %s' % context.portfolio.positions_value)
+    log.info('capital used: %s' % context.portfolio.capital_used)
+    log.info('positions amounts: %s' % context.portfolio.positions_amounts)
 
 
 def caa_rebalance(context, data):
