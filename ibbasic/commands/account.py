@@ -17,5 +17,5 @@ con.register(contract_handler, 'UpdatePortfolio')
 con.connect()
 con.reqAccountUpdates(1, '')
 
-sleep(3)
+sleep(5)
 con.disconnect()
