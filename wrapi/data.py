@@ -43,8 +43,8 @@ class Data(object):
                 rows = self.historical_data_provider.history(symbol, field, window)
             elif frequency == '1m':
                 rows = self.historical_data_provider.history_min(symbol, window)
-            df = pd.DataFrame(map(lambda x: x[1:], rows), index=map(lambda x: x[0], rows), columns = ['price'])
-            return df
+            series = pd.Series(map(lambda x: x[1], rows), index=map(lambda x: x[0], rows))
+            return series
 
     def current(self, symbols):
         if type(symbols) is str:
@@ -65,9 +65,13 @@ class Data(object):
 
 if __name__ == '__main__':
     data = Data()
-    # print data.history('QQQ', field='close', window=100)
-    dt = data.history('XIV', window=1000, frequency='1m')
-    print dt
+    result = data.history(['SPY', 'QQQ'], field='close', window=100)
+    print result
+    print type(result)
+    result = data.history('QQQ', field='close', window=100)
+    print result
+    print result[0]
+    dt = data.history('SVXY', window=1000, frequency='1m')
     print dt.resample('30T').last()
     # print data.history('SPX')
     #print data.history(['SPY', 'VIX'], window=252)
