@@ -1,7 +1,9 @@
-from wrapi.quantopian import schedule_function, date_rules, time_rules, symbols, log, order_target_percent
+from wrapi.quantopian import schedule_function, date_rules, time_rules, symbols,symbol, log, order_target_percent,get_open_orders
 import numpy as np
 import pandas as pd
 import traceback
+import time
+from common.tradetime import TradeTime
 
 
 def initialize(context):
@@ -25,8 +27,10 @@ def initialize(context):
 
 
 def handle_data(context, data):
-    log.info('SPX price:%s;  SVXY price:%s' % (data.current('SPX'), data.current('SVXY')))
-
+    # log.info('SPX price:%s;  SVXY price:%s' % (data.current('SPX'), data.current('SVXY')))
+    # display_all(context,data)
+    caa_rebalance(context, data)
+    time.sleep(100)
 
 def display_all(context, data):
     log.info('portfolio value:%s' % context.portfolio.portfolio_value)
@@ -46,14 +50,12 @@ def caa_rebalance(context, data):
     R3 = (prices.iloc[-1] - prices.iloc[-21 * 3]) / prices.iloc[-21 * 3]  # recent 3 month return
     R6 = (prices.iloc[-1] - prices.iloc[-21 * 6]) / prices.iloc[-21 * 6]  # recent 6 month return
     R_mom = (R1 + R3 + R6 + R12) / 22
-    mean = R_mom.reshape((N, 1))  # expected return
+    mean = R_mom.values.reshape((N, 1))  # expected return
 
     lower_bounds = context.caa_lower_bounds
     upper_bounds = context.caa_upper_bounds
 
     try:
-        print 'mean=%s' % mean
-        print 'covar=%s' % covar
         cla = CLA(mean, covar, lower_bounds, upper_bounds)
         cla.solve()
         weights = pd.Series(getWeights(cla, context.caa_tv).flatten(), index=R.columns)
@@ -63,12 +65,25 @@ def caa_rebalance(context, data):
             if stock not in ['BIL']:
                 percent = round(weights[stock], 3) * context.caa_total_ratio
                 log.info('order_target_percent {} {}'.format(stock, percent))
-                order_target_percent(stock, percent)
+                # order_target_percent(stock, percent)
+                order_target_radio(context, data, stock, percent)
     except Exception as e:
         # Reset the trade date to try again on the next bar
         log.error('Trace: ' + traceback.format_exc())
         log.error(str(e))
 
+
+# Replacement of order_target_percent
+def order_target_radio(context, data, stock, radio):
+    if len(get_open_orders(stock)) != 0:
+        log.warning('There are remained orders for stock : ' + stock + ', order canceled.')
+        return
+    if not TradeTime.is_market_open():
+        print  time.asctime()
+        log.warning( 'Market is not opened, order canceled : ' + str(stock) + ' : '+ str(radio))
+        return
+    order_target_percent(stock,radio)
+    log.info('%s : ratio %s ' % (stock.symbol, str(round(ratio,2))))
 
 def getWeights(cla, tv):
     mu, sigma, weights = cla.efFrontier(1000)  # get effective fronter
