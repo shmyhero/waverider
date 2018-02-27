@@ -63,8 +63,6 @@ class StrategyRunner(object):
                         except Exception as e:
                             logger.error('Trace: ' + traceback.format_exc(), False)
                             logger.error('Error: get action arguments failed:' + str(e))
-                    else:
-                        logger.info('market not open...')
                 last_minute = now.minute
 
     @staticmethod
