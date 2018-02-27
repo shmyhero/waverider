@@ -19,7 +19,7 @@ def initialize(context):
 
     schedule_function(caa_rebalance,
                       date_rules.every_day(),
-                      time_rules.market_open(minutes=5))
+                      time_rules.market_open(minutes=31))
 
     schedule_function(display_all,
                       date_rules.every_day(),
@@ -66,7 +66,7 @@ def caa_rebalance(context, data):
                 percent = round(weights[stock], 3) * context.caa_total_ratio
                 log.info('order_target_percent {} {}'.format(stock, percent))
                 # order_target_percent(stock, percent)
-                order_target_radio(context, data, stock, percent)
+                order_target_ratio(context, data, stock, percent)
     except Exception as e:
         # Reset the trade date to try again on the next bar
         log.error('Trace: ' + traceback.format_exc())
@@ -74,16 +74,16 @@ def caa_rebalance(context, data):
 
 
 # Replacement of order_target_percent
-def order_target_radio(context, data, stock, radio):
+def order_target_ratio(context, data, stock, ratio):
     if len(get_open_orders(stock)) != 0:
         log.warning('There are remained orders for stock : ' + stock + ', order canceled.')
         return
     if not TradeTime.is_market_open():
         print  time.asctime()
-        log.warning( 'Market is not opened, order canceled : ' + str(stock) + ' : '+ str(radio))
+        log.warning( 'Market is not opened, order canceled : ' + str(stock) + ' : ' + str(ratio))
         return
-    order_target_percent(stock,radio)
-    log.info('%s : ratio %s ' % (stock.symbol, str(round(ratio,2))))
+    order_target_percent(stock, ratio)
+    log.info('%s : ratio %s ' % (stock, str(round(ratio, 2))))
 
 def getWeights(cla, tv):
     mu, sigma, weights = cla.efFrontier(1000)  # get effective fronter
