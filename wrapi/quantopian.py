@@ -208,18 +208,29 @@ class log(object):
         return Container.get_logger(strategy_name=strategy_name)
 
     @staticmethod
+    def get_error_logger():
+        frame = inspect.stack()[2]
+        the_module = inspect.getmodule(frame[0])
+        filename = the_module.__file__
+        strategy_name = string_fetch(os.path.split(filename)[1], '', '.')
+        return Container.get_logger(strategy_name='%s_error' % strategy_name)
+
+    @staticmethod
     def info(content):
         log.get_logger().info(content)
 
     @staticmethod
     def error(content):
         log.get_logger().error(content)
+        log.get_error_logger().error(content, False)
 
     @staticmethod
     def warning(content):
         log.get_logger().warning(content)
+        log.get_error_logger().warning(content, False)
 
     @staticmethod
     def exception(content):
         log.get_logger().exception(content)
+        log.get_error_logger().exception(content, False)
 

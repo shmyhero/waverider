@@ -50,6 +50,7 @@ class StrategyRunner(object):
                 continue
             else:
                 logger = StrategyRunner.get_logger()
+                # logger.info('check schedule functions...')
                 for schedule_function in schedule_functions:
                     try:
                         schedule_function.run(now)
@@ -57,12 +58,16 @@ class StrategyRunner(object):
                         logger.error('Trace: ' + traceback.format_exc(), False)
                         logger.error('Error: get action arguments failed:' + str(e))
                 if handle_function is not None:
+                    # logger.info('check handle functions...')
                     if market_open_only is False or TradeTime.is_market_open():
                         try:
                             handle_function()
                         except Exception as e:
                             logger.error('Trace: ' + traceback.format_exc(), False)
                             logger.error('Error: get action arguments failed:' + str(e))
+                    else:
+                        # logger.info('market not open...')
+                        pass
                 last_minute = now.minute
 
     @staticmethod
@@ -94,5 +99,4 @@ if __name__ == '__main__':
     StrategyRunner.run('b')
     #time.sleep(5)
     #StrategyRunner.run_strategy_in_real_time('b')
-
 

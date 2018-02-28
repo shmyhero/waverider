@@ -61,6 +61,8 @@ class API(object):
 
     def get_portfolio_info(self):
         output = self.run_cmd('account')
+        if output == '':
+            raise Exception('Failed to get account info, please check the IB gateway, config, network and ibpy2 packages, etc...')
         str_available_funds = string_fetch(output, 'AvailableFunds, value=', ',')
         self.logger.info("available_funds string value: %s"%str_available_funds)
         available_funds = float(str_available_funds)

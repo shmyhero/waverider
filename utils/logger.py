@@ -31,6 +31,14 @@ class Logger:
             Logger.log_file = file_path
             Logger.logger_names.append(name)
 
+    @property
+    def level(self):
+        return self.logger.level
+
+    @level.setter
+    def level(self, level):
+        self.logger.level = level
+
     def output_console(self, customized_console):
         if customized_console is None:
             return self.console
@@ -60,6 +68,12 @@ class Logger:
             sys.stderr.write('%s\n'%content)
         if self.log_path:
             self.logger.exception(content)
+
+    def debug(self, content, console = None):
+        if self.output_console(console):
+            sys.stderr.write('%s\n'%content)
+        if self.log_path:
+            self.logger.debug(content)
 
 
 class DailyLoggerFactory(object):

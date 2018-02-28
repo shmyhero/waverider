@@ -35,11 +35,9 @@ def handle_data(context, data):
     log.info('%s \t %s' % (round(pct,3), time.asctime()))
     time.sleep(1)
 
+
 def display_all(context, data):
-    log.info('portfolio value:%s' % context.portfolio.portfolio_value)
-    log.info('position value: %s' % context.portfolio.positions_value)
-    log.info('capital used: %s' % context.portfolio.capital_used)
-    log.info('positions amounts: %s' % context.portfolio.positions_amounts)
+    log.info(context.display_all())
 
 
 def caa_rebalance(context, data):
@@ -82,11 +80,12 @@ def order_target_ratio(context, data, stock, ratio):
         log.warning('There are remained orders for stock : ' + stock + ', order canceled.')
         return
     if not TradeTime.is_market_open():
-        print  time.asctime()
-        log.warning( 'Market is not opened, order canceled : ' + str(stock) + ' : ' + str(ratio))
+        print time.asctime()
+        log.warning('Market is not opened, order canceled : ' + str(stock) + ' : ' + str(ratio))
         return
     order_target_percent(stock, ratio)
     log.info('%s : ratio %s ' % (stock, str(round(ratio, 2))))
+
 
 def getWeights(cla, tv):
     mu, sigma, weights = cla.efFrontier(1000)  # get effective fronter
