@@ -13,12 +13,16 @@ class Context(object):
         return self._portfolio
 
     def display_all(self):
+        # positions = '\r\n'.join(self.portfolio.positions_amounts)
+        positions = '\n\r'
+        for k,v in self.portfolio.positions_amounts:
+            positions = positions + k + ':\t'+ str(v) + '\n\r'
+
         content = ['portfolio value:%s' % self.portfolio.portfolio_value,
                    'position value: %s' % self.portfolio.positions_value,
                    'capital used: %s' % self.portfolio.capital_used,
-                   'positions amounts: %s' % self.portfolio.positions_amounts]
+                   'positions amounts: %s' % positions]
         return '\r\n'.join(content)
-
 
 if __name__ == '__main__':
     print Context().display_all() 
