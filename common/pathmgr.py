@@ -21,21 +21,26 @@ class PathMgr(object):
     def get_log_path(sub_path=None):
         project_path = PathMgr.get_project_path()
         if sub_path:
-            log_path = os.path.join(project_path, "logs", sub_path)
+            log_path = os.path.join(project_path, 'logs', sub_path)
         else:
-            log_path = os.path.join(project_path, "logs")
+            log_path = os.path.join(project_path, 'logs')
         ensure_dir_exists(log_path)
         return log_path
 
     @staticmethod
     def get_command_file_path(cmd_name):
         project_path = PathMgr.get_project_path()
-        return os.path.join(project_path, "ibbasic", 'commands',  cmd_name + '.py')
+        return os.path.join(project_path, 'ibbasic', 'commands',  cmd_name + '.py')
 
     @staticmethod
     def get_data_file_path(filename):
         project_path = PathMgr.get_project_path()
-        return os.path.join(project_path, "data", filename)
+        return os.path.join(project_path, 'data', filename)
+
+    @staticmethod
+    def get_strategies_config_file(strategy_name):
+        project_path = PathMgr.get_project_path()
+        return os.path.join(project_path, 'strategies', 'configs', '%s.json' % strategy_name)
 
 
 
