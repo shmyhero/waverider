@@ -9,6 +9,7 @@ from common.tradetime import TradeTime
 def initialize(context):
     context.caa_tv = 0.08  # Target annual volatility
     context.caa_total_ratio = 0.5
+    context.spy = symbol('SPY')  # SPY
     # context.caa_stocks = symbols('SPY', 'QQQ',  'EFA',  'EEM',  'EWJ',  'HYG',  'IEF',  'BIL')  # N-8 Universe
     # context.caa_lower_bounds = [[0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00]]
     # context.caa_upper_bounds = [[0.25], [0.25], [0.25], [0.25], [0.25], [0.25], [1.00], [1.00]]
@@ -27,10 +28,12 @@ def initialize(context):
 
 
 def handle_data(context, data):
-    # log.info('SPX price:%s;  SVXY price:%s' % (data.current('SPX'), data.current('SVXY')))
-    # display_all(context,data)
-    caa_rebalance(context, data)
-    time.sleep(100)
+    now = data.current(context.spy)
+    time.sleep(1) # to see whether it need time between two data request.
+    last = data.history(context.spy, 'close', 2, '1d')[0]
+    pct = (now - last) / last
+    log.info('%s \t %s' % (round(pct,3), time.asctime()))
+    time.sleep(1)
 
 def display_all(context, data):
     log.info('portfolio value:%s' % context.portfolio.portfolio_value)
