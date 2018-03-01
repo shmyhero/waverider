@@ -27,6 +27,7 @@ class ScheduleFunction(object):
 
 
 class Container(object):
+    """ this class does not support run multiple strategies in parallel"""
 
     data = Data()
 

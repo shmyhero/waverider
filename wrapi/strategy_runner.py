@@ -44,6 +44,8 @@ class StrategyRunner(object):
         handle_function = Container.get_handle_function(strategy_name)
         last_minute = datetime.datetime.now().minute-1
         while True:
+            if Container.context.terminate_p:
+                break
             now = datetime.datetime.now()
             if now.minute == last_minute:
                 time.sleep(1)

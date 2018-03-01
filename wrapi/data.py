@@ -35,6 +35,8 @@ class Data(object):
                     results = map(list, rows)
                 else:
                     map(lambda x, y: x.append(y[1]), results, rows)
+            if len(results) > window:
+                results = results[:window]
             df = pd.DataFrame(map(lambda x: x[1:], results), index=map(lambda x: x[0], results), columns=columns[1:])
             return df
         else:
@@ -43,6 +45,8 @@ class Data(object):
                 rows = self.historical_data_provider.history(symbol, field, window)
             elif frequency == '1m':
                 rows = self.historical_data_provider.history_min(symbol, window)
+            if len(rows) > window:
+                rows = rows[:window]
             series = pd.Series(map(lambda x: x[1], rows), index=map(lambda x: x[0], rows))
             return series
 
@@ -65,7 +69,7 @@ class Data(object):
 
 if __name__ == '__main__':
     data = Data()
-    result = data.history(['SPY', 'QQQ'], field='close', window=100)
+    result = data.history(['SPY', 'QQQ'], field='close', window=1)
     print result
     print type(result)
     result = data.history('QQQ', field='close', window=100)
