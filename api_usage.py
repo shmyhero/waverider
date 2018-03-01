@@ -6,7 +6,7 @@ from wrapi.strategy_runner import StrategyRunner
 # this file is used for testing any wrapi, feel free to modify it..
 
 if __name__ == '__main__':
-    print get_open_orders()
+    # print get_open_orders()
     # print get_open_orders('SPY')
     # order_target('SPY', 10, OrderStyle.LimitOrder(260))
     # order_target('QQQ', -12)
@@ -30,8 +30,9 @@ if __name__ == '__main__':
     # print context.portfolio.positions['SPY'].cost_basic
     # context.abc = 1
     # print context.abc
-    # data = Data()
-    # print data.history('QQQ',  window=1, frequency='1d')
+    data = Data()
+    # print data.history('SPY',  window=1, frequency='1d')
+    print data.history('SPY', 'close', 1, '1d')
     # print data.history(['SPY', 'VIX'], window=252)
     # print data.current(['SPY', 'VIX'])
     # StrategyRunner.run('caa')
