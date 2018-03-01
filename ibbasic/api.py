@@ -64,10 +64,10 @@ class API(object):
         if output == '':
             raise Exception('Failed to get account info, please check the IB gateway, config, network and ibpy2 packages, etc...')
         str_available_funds = string_fetch(output, 'AvailableFunds, value=', ',')
-        self.logger.info("available_funds string value: %s"%str_available_funds)
+        # self.logger.info("available_funds string value: %s"%str_available_funds)
         available_funds = float(str_available_funds)
         str_net_liquidation = string_fetch(output, 'NetLiquidation, value=', ',')
-        self.logger.info("net_liquidation string value: %s" % str_net_liquidation)
+        # self.logger.info("net_liquidation string value: %s" % str_net_liquidation)
         net_liquidation = float(str_net_liquidation)
         items = output.split('<updatePortfolio')
         if len(items) > 0:
