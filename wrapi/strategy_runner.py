@@ -96,7 +96,7 @@ class StrategyRunner(object):
 
 if __name__ == '__main__':
     #pass
-    StrategyRunner.run('b')
+    StrategyRunner.run('a')
     #time.sleep(5)
     #StrategyRunner.run_strategy_in_real_time('b')
 

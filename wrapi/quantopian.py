@@ -5,7 +5,6 @@ from date_rules import EveryDayRule, WeekStartRule, WeekEndRule, MonthStartRule,
 from time_rules import MarketOpenRule, MarketCloseRule
 import inspect
 from wrapi.order import OrderStyle, Order
-from wrapi.strategy_config import StrategyConfig
 
 
 def schedule_function(func, date_rule, time_rule):
@@ -193,10 +192,6 @@ def symbols(*args):
     :return: the list of assets
     """
     return list(args)
-
-
-def create_config(strategy_name):
-    return StrategyConfig(strategy_name)
 
 
 class log(object):

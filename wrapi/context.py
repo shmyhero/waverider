@@ -1,9 +1,11 @@
 from ibbasic.api import API
+from wrapi.strategy_config import StrategyConfig
 
 
 class Context(object):
 
     def __init__(self):
+        self.strategy_name = None
         self._portfolio = None
 
     @property
@@ -23,6 +25,12 @@ class Context(object):
                    'capital used: %s' % self.portfolio.capital_used,
                    'positions amounts: %s' % positions]
         return '\r\n'.join(content)
+
+    def get(self, section_name, key):
+        return StrategyConfig(self.strategy_name).get(section_name, key)
+
+    def set(self, section_name, key, value):
+        return StrategyConfig(self.strategy_name).set(section_name, key, value)
 
 if __name__ == '__main__':
     print Context().display_all() 

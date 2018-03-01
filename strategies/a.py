@@ -1,4 +1,4 @@
-from wrapi.quantopian import schedule_function, date_rules, time_rules, create_config, log
+from wrapi.quantopian import schedule_function, date_rules, time_rules, log
 
 
 def initialize(context):
@@ -17,14 +17,13 @@ def my_func(context, data):
 
 def handle_data(context, data):
     log.info('----------output for handle data in a strategy------------')
-    print context.portfolio.portfolio_value
+    # print context.portfolio.portfolio_value
     print data.current('SPY')
-    # config = create_config('a')
-    # print config.get('spy', 'crash')
-    # config.set('spy', 'crash', True)
-    # config.set('spy', 'stop_order_price', 250)
-    # print config.get('spy', 'crash')
-    # print config.get('spy', 'stop_order_price')
+    print context.get('spy', 'crash')
+    context.set('spy', 'crash', True)
+    context.set('spy', 'stop_order_price', 250)
+    print context.get('spy', 'crash')
+    print context.get('spy', 'stop_order_price')
     log.info('----------end of handle data in a strategy------------')
 
 

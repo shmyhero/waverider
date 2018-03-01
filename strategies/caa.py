@@ -1,4 +1,4 @@
-from wrapi.quantopian import schedule_function, date_rules, time_rules, symbols,symbol, create_config, log, order_target_percent,get_open_orders
+from wrapi.quantopian import schedule_function, date_rules, time_rules, symbols,symbol, log, order_target_percent,get_open_orders
 import numpy as np
 import pandas as pd
 import traceback

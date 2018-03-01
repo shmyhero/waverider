@@ -41,6 +41,7 @@ class Container(object):
     @staticmethod
     def set_current_strategy(strategy_name):
         Container.current_strategy = strategy_name
+        Container.context.strategy_name = strategy_name
         if strategy_name in Container._schedule_function_dic.keys():
             Container._schedule_function_dic[strategy_name] = None
 
