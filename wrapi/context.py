@@ -1,3 +1,5 @@
+import datetime
+import pytz
 from ibbasic.api import API
 from wrapi.strategy_config import StrategyConfig
 
@@ -36,6 +38,10 @@ class Context(object):
     def terminate(self):
         self.terminate_p = True
 
+    def now(self):
+        return datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
+
 if __name__ == '__main__':
-    print Context().display_all() 
+    # print Context().display_all()
+    print Context().now()
 
