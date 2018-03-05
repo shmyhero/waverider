@@ -35,13 +35,17 @@ class Context(object):
     def set(self, section_name, key, value):
         return StrategyConfig(self.strategy_name).set(section_name, key, value)
 
-    def terminate(self):
+    def end(self):
         self.terminate_p = True
 
     def now(self):
         return datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
 
+    def now_tostring(self):
+        return self.now().strftime('%Y-%m-%d %H:%M:%S')
+
+
 if __name__ == '__main__':
     # print Context().display_all()
-    print Context().now()
+    print Context().now_tostring()
 
