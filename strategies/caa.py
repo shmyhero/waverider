@@ -16,7 +16,7 @@ def initialize(context):
 
     context.caa_stocks = symbols('SSO', 'QQQ', 'EFA', 'AAXJ', 'EWJ', 'HYG', 'IEF', 'BIL')  # N-8 Universe ['SSO', 'BIL']
     context.caa_lower_bounds = [[0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00]]
-    context.caa_upper_bounds = [[0.25], [0.25], [0.25], [0.25], [0.25], [0.25], [0.25], [1.00]]
+    context.caa_upper_bounds = [[0.25], [0.25], [0.25], [0.25], [0.25], [0.25], [1.00], [1.00]]
 
     schedule_function(caa_rebalance,
                       date_rules.every_day(),
