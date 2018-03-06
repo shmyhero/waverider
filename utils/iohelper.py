@@ -26,6 +26,12 @@ def write_to_file(file_path, content):
     f.close()
 
 
+def append_to_file(file_path, content):
+    f = open(file_path, 'a')
+    f.write(content)
+    f.close()
+
+
 def get_sub_dir_names(path):
     if os.path.exists(path):
         file_names = os.listdir(path)

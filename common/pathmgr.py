@@ -42,5 +42,10 @@ class PathMgr(object):
         project_path = PathMgr.get_project_path()
         return os.path.join(project_path, 'strategies', 'configs', '%s.json' % strategy_name)
 
+    @staticmethod
+    def get_strategies_tradetrace_file(strategy_name):
+        project_path = PathMgr.get_project_path()
+        return os.path.join(project_path, 'strategies', 'tradetrace', '%s.csv' % strategy_name)
+
 
 

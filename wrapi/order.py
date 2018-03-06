@@ -17,13 +17,16 @@ class OrderStyle(object):
     def LimitOrder(lmt_price):
         return ['LMT', lmt_price]
 
+
 class Order(object):
 
     def __init__(self):
         pass
 
     @staticmethod
-    def order_target(asset, amount, style=OrderStyle.MarketOrder, sec_type='STK'):
+    def order_target(asset, amount, style=OrderStyle.MarketOrder, sec_type='STK', trade_trace_fn=None):
+        # if trade_trace_fn is not None:
+        #     trade_trace_fn(asset, amount)
         [order_type, price] = style
         if amount > 0:
             return API().order(asset, sec_type, order_type, amount, 'BUY', price)
@@ -31,9 +34,11 @@ class Order(object):
             return API().order(asset, sec_type, order_type, -amount, 'SELL', price)
         else:
             pass
+        if trade_trace_fn is not None:
+            trade_trace_fn(asset, amount)
 
     @staticmethod
-    def order_target_percent(asset, percent, style=OrderStyle.MarketOrder, sec_type = 'STK'):
+    def order_target_percent(asset, percent, style=OrderStyle.MarketOrder, sec_type='STK', trade_trace_fn=None):
         portfolio = API().get_portfolio_info()
         current_percent = portfolio.get_percentage(asset)
         order_cash = (percent - current_percent) * portfolio.net_liquidation
@@ -44,7 +49,7 @@ class Order(object):
                 from wrapi.data import Data
                 market_price = Data().current(asset)
             amount = int(round(order_cash/market_price))
-            return Order.order_target(asset, amount, style)
+            return Order.order_target(asset, amount, style, sec_type, trade_trace_fn)
         else:
             raise Exception('The cost of asset exceed total cash...')
 

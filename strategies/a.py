@@ -1,4 +1,4 @@
-from wrapi.quantopian import schedule_function, date_rules, time_rules, log
+from wrapi.quantopian import schedule_function, date_rules, time_rules, log, order_target, order_target_percent
 
 
 def initialize(context):
@@ -17,6 +17,8 @@ def my_func(context, data):
 
 def handle_data(context, data):
     log.info('----------output for handle data in a strategy------------')
+    # order_target('SPY', 1)
+    # order_target_percent('SPY', 0.2)
     # print context.portfolio.portfolio_value
     print data.current('SPY')
     print context.get('spy', 'crash')
@@ -24,6 +26,7 @@ def handle_data(context, data):
     context.set('spy', 'stop_order_price', 250)
     print context.get('spy', 'crash')
     print context.get('spy', 'stop_order_price')
+    # context.end()
     log.info('----------end of handle data in a strategy------------')
 
 
