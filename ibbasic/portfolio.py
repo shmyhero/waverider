@@ -1,3 +1,5 @@
+from collections import MutableMapping
+
 
 class Position(object):
 
@@ -16,7 +18,31 @@ class Position(object):
         return self.amount * self.cost_basic
 
     def __str__(self):
-            return str(self.__dict__)
+        return str(self.__dict__)
+
+
+class Positions(MutableMapping):
+
+    def __init__(self, *args, **kw):
+        self._storage = dict(*args, **kw)
+
+    def __getitem__(self, key):
+        if key in self._storage.keys():
+            return self._storage[key]
+        else:
+            return 0
+
+    def __setitem__(self, key, value):
+        self._storage[key] = value
+
+    def __delitem__(self, key):
+        self._storage.pop(key)
+
+    def __iter__(self):
+        return iter(self._storage)
+
+    def __len__(self):
+        return len(self._storage)
 
 
 class Portfolio(object):
@@ -28,9 +54,10 @@ class Portfolio(object):
         self.positions = self.init_positions()
 
     def init_positions(self):
-        positions = {}
+        positions = Positions()
         for (symbol, (quantity, market_price, cost_price)) in self.contract_dict.items():
-            positions[symbol] = Position(symbol, quantity, market_price, cost_price)
+            if quantity != 0:
+                positions[symbol] = Position(symbol, quantity, market_price, cost_price)
         return positions
 
     def get_quantity(self, symbol):

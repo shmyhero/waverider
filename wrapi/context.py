@@ -37,6 +37,7 @@ class Context(object):
 
     def end(self):
         self.terminate_p = True
+        # raise Exception("Terminated...")
 
     def now(self):
         return datetime.datetime.now(tz=pytz.timezone('US/Eastern'))

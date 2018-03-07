@@ -16,13 +16,14 @@ if __name__ == '__main__':
     # cancel_order(100253)
     # set_stop_price('SPY', 250)
 
-    # context = Context()
+    context = Context()
     # print context.portfolio
     # print context.portfolio.portfolio_value
     # print context.portfolio.positions_value
     # print context.portfolio.capital_used
     # print context.portfolio.positions
-    # print context.portfolio.positions['EFA']
+    print context.display_all()
+    print context.portfolio.positions['EFA']
     # print context.portfolio.positions['SPY'].symbol
     # print context.portfolio.positions['SPY'].amount
     # print context.portfolio.positions['QQQ'].amount
@@ -30,9 +31,9 @@ if __name__ == '__main__':
     # print context.portfolio.positions['SPY'].cost_basic
     # context.abc = 1
     # print context.abc
-    data = Data()
+    # data = Data()
     # print data.history('SPY',  window=1, frequency='1d')
-    print data.history('SPY', 'close', 1, '1d')
+    # print data.history('SPY', 'close', 1, '1d')
     # print data.history(['SPY', 'VIX'], window=252)
     # print data.current(['SPY', 'VIX'])
     # StrategyRunner.run('caa')
