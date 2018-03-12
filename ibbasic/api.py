@@ -2,6 +2,7 @@ from utils.iohelper import read_file_to_string, write_to_file
 from utils.logger import Logger
 from utils.shell import Shell
 from utils.stringhelper import string_fetch
+from utils.mathhelper import average
 from common.pathmgr import PathMgr
 from utils.listhelper import list_to_hash
 from ibbasic.portfolio import Portfolio
@@ -99,8 +100,10 @@ class API(object):
         output = self.run_cmd('market', [symbol, sec_type, exchange, currency, strike, expiry, action])
         items = output.split('<tickPrice')
         if len(items) > 1:
-            prices = map(lambda x : float(string_fetch(x, 'price=', ',')), items[1:])
-            return max(prices)
+            prices = map(lambda x: float(string_fetch(x, 'price=', ',')), items[1:])
+            prices.sort()
+            middle_index = len(prices)/2
+            return prices[middle_index]
         else:
             raise Exception('Unable to get market price...')
 
@@ -114,9 +117,9 @@ class API(object):
             self.logger.info('OrderId %s cancelled'%order_id)
 
 if __name__ == '__main__':
-    print API().get_portfolio_info()
+    # print API().get_portfolio_info()
     #print API.get_order_id()
-    #print API().get_market_price('GOOG')
+    print API().get_market_price('GOOG')
     #print API().get_market_price('SPY', 'OPT', strike=258, expiry='20171215', action='CALL')
 
 

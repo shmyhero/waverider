@@ -2,7 +2,7 @@ import pandas as pd
 from utils.logger import Logger
 from common.pathmgr import PathMgr
 from dataaccess.history import DBProvider
-from dataaccess.webscraper import YahooScraper, MarketWatchScraper
+from dataaccess.current import YahooScraper, MarketWatchScraper, IBCurrent
 
 
 class Data(object):
@@ -10,7 +10,7 @@ class Data(object):
     def __init__(self):
         self.logger = Logger(__name__, PathMgr.get_log_path())
         self.historical_data_provider = DBProvider()
-        self.current_data_provider_lst = [YahooScraper(), MarketWatchScraper()]
+        self.current_data_provider_lst = [IBCurrent(), YahooScraper(), MarketWatchScraper()]
 
     def history(self, assets, field='price', window=30, frequency='1d'):
         """

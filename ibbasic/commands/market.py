@@ -25,7 +25,7 @@ def get_market_value(symbol, sec_type, exchange, currency, expiry, strike, right
                        message.tickString, message.tickOptionComputation)
         con.register(ticket_price_handler, message.tickPrice)
     con.connect()
-    sleep(1)
+    sleep(2)
     tickId = 1
     contract = Contract()
     contract.m_symbol = symbol

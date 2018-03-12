@@ -1,14 +1,13 @@
-import json
 import traceback
 from abc import ABCMeta, abstractmethod
-from datetime import datetime
 from utils.httphelper import HttpHelper
 from utils.stringhelper import string_fetch
 from utils.logger import Logger
 from dataaccess.symbols import Symbols
+from ibbasic.api import API
 
 
-class WebScraper(object):
+class AbstractCurrentDataProvider(object):
 
     __metaclass__ = ABCMeta
 
@@ -17,7 +16,7 @@ class WebScraper(object):
         pass
 
 
-class YahooScraper(WebScraper):
+class YahooScraper(AbstractCurrentDataProvider):
 
     def __init__(self, logger=Logger(__name__, None)):
         self.logger = logger
@@ -41,7 +40,7 @@ class YahooScraper(WebScraper):
             return None
 
 
-class MarketWatchScraper(WebScraper):
+class MarketWatchScraper(AbstractCurrentDataProvider):
 
     def __init__(self, logger=Logger(__name__, None)):
         self.logger = logger
@@ -63,9 +62,28 @@ class MarketWatchScraper(WebScraper):
             return None
 
 
+class IBCurrent(AbstractCurrentDataProvider):
+
+    def __init__(self, logger=Logger(__name__, None)):
+        self.api = API()
+        self.logger = logger
+
+    def get_data_by_symbol(self, symbol):
+        return self.api.get_market_price(symbol)
+
+    def get_current_data(self, symbols):
+        try:
+            return map(self.get_data_by_symbol, symbols)
+        except Exception as e:
+            self.logger.error('Trace: ' + traceback.format_exc(), False)
+            self.logger.error('Error: get current price from IB failed:' + str(e))
+            return None
+
+
 if __name__ == '__main__':
     # print YahooScraper().get_current_data(['SPX', 'SPY'])
-    print YahooScraper().get_current_data(['YM=F', 'ES=F'])
+    # print YahooScraper().get_current_data(['YM=F', 'ES=F'])
     # print BarChartScraper().get_current_data(['XIV', 'SVXY'])
     # print MarketWatchScraper().get_current_data(['DJI', 'SPX'])
-    #print MarketWatchScraper().get_current_data(['XIV'])
+    # print MarketWatchScraper().get_current_data(['XIV'])
+    print IBCurrent().get_current_data(['SPY', 'SVXY'])
