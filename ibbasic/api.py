@@ -98,6 +98,8 @@ class API(object):
 
     def get_market_price(self, symbol, sec_type = 'STK', exchange = 'SMART', currency = 'USD', strike = 0.0, expiry = '', action = ''):
         output = self.run_cmd('market', [symbol, sec_type, exchange, currency, strike, expiry, action])
+        if 'errorCode=2119' in output:
+            output = self.run_cmd('market', [symbol, sec_type, exchange, currency, strike, expiry, action])
         items = output.split('<tickPrice')
         if len(items) > 1:
             prices = map(lambda x: float(string_fetch(x, 'price=', ',')), items[1:])

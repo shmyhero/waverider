@@ -1,9 +1,12 @@
 import datetime
 import pytz
-from utils.logger import Logger, DailyLoggerFactory
+from utils.logger import DailyLoggerFactory
 from common.pathmgr import PathMgr
 from wrapi.context import Context
 from wrapi.data import Data
+from wrapi.analysis import PortfolioDAO
+from wrapi.date_rules import EveryDayRule
+from wrapi.time_rules import MarketCloseRule
 
 
 class ScheduleFunction(object):
@@ -64,7 +67,8 @@ class Container(object):
 
     @staticmethod
     def get_schedule_functions(strategy_name):
-        return Container._schedule_function_dic[strategy_name]
+        global_schedule_functions = [ScheduleFunction(lambda : PortfolioDAO.save_portfolio_info(strategy_name), EveryDayRule(), MarketCloseRule(-4))]
+        return Container._schedule_function_dic[strategy_name] + global_schedule_functions
 
     @staticmethod
     def get_handle_function(strategy_name):

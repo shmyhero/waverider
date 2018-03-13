@@ -1,14 +1,11 @@
 import os
-import datetime
-import pytz
 from utils.stringhelper import string_fetch
-from utils.iohelper import append_to_file
-from common.pathmgr import PathMgr
-from wrapi.container import Container, Data
+from wrapi.container import Container
 from date_rules import EveryDayRule, WeekStartRule, WeekEndRule, MonthStartRule, MonthEndRule
 from time_rules import MarketOpenRule, MarketCloseRule
 import inspect
 from wrapi.order import OrderStyle, Order
+from wrapi.analysis import TradeRecordDAO
 
 
 def schedule_function(func, date_rule, time_rule):
@@ -116,17 +113,6 @@ class time_rules(object):
         return MarketCloseRule(hours, minutes)
 
 
-def log_trade_trace(asset, amount, style):
-    file_path = PathMgr.get_strategies_tradetrace_file(Container.current_strategy)
-    time = datetime.datetime.now(tz=pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S')
-    if style == OrderStyle.MarketOrder:
-        price = Data().current(asset)
-    else:
-        price = style[1]
-    content = ','.join(map(str, [time, asset, amount, price]))
-    append_to_file(file_path, '%s\r\n'% content)
-
-
 def order_target(asset, amount, style=OrderStyle.MarketOrder, sec_type='STK'):
     """
     Places an order to a target number of shares.
@@ -137,7 +123,8 @@ def order_target(asset, amount, style=OrderStyle.MarketOrder, sec_type='STK'):
     :param sec_type: The security type for the contract ('STK' is 'stock'), it can be 'OPT' or 'CASH'
     :return:order id
     """
-    return Order.order_target(asset, amount, style, sec_type, lambda x, y: log_trade_trace(x, y, style))
+    return Order.order_target(asset, amount, style, sec_type,
+                              lambda x, y: TradeRecordDAO.write_trade_trace(Container.current_strategy, x, y, style))
 
 
 def order_target_percent(asset, percent, style=OrderStyle.MarketOrder, sec_type='STK'):
@@ -155,7 +142,8 @@ def order_target_percent(asset, percent, style=OrderStyle.MarketOrder, sec_type=
     :param sec_type: he security type for the contract ('STK' is 'stock'), it can be 'OPT' or 'CASH'
     :return: order id
     """
-    return Order.order_target_percent(asset, percent, style, sec_type, lambda x, y: log_trade_trace(x, y, style))
+    return Order.order_target_percent(asset, percent, style, sec_type,
+                                      lambda x, y: TradeRecordDAO.write_trade_trace(Container.current_strategy, x, y, style))
 
 
 def get_open_orders(asset=None):

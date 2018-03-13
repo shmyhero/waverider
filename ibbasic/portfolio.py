@@ -89,8 +89,14 @@ class Portfolio(object):
     def capital_used(self):
         return sum(map(lambda x: x.cost, self.positions.values()))
 
-    def __str__(self):
-            return str(self.__dict__)
+    def to_dict(self):
+        dic = {}
+        for key in self.__dict__.keys():
+            if key != 'positions':
+                dic[key] = self.__dict__[key]
+        return dic
 
-
+    @staticmethod
+    def from_dict(dic):
+        return Portfolio(dic['available_funds'], dic['net_liquidation'], dic['contract_dict'])
 
