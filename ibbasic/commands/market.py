@@ -19,13 +19,11 @@ def ticket_price_handler(msg):
 def get_market_value(symbol, sec_type, exchange, currency, expiry, strike, right):
     con = ibConnection()
     con.registerAll(watcher)
-    showBidAskOnly = True  # set False to see the raw messages
-    if showBidAskOnly:
-        con.unregister(watcher, message.tickSize, message.tickPrice,
-                       message.tickString, message.tickOptionComputation)
-        con.register(ticket_price_handler, message.tickPrice)
+    con.unregister(watcher, message.tickSize, message.tickPrice,
+                   message.tickString, message.tickOptionComputation)
+    con.register(ticket_price_handler, message.tickPrice)
     con.connect()
-    sleep(2)
+    sleep(1)
     tickId = 1
     contract = Contract()
     contract.m_symbol = symbol
@@ -37,10 +35,10 @@ def get_market_value(symbol, sec_type, exchange, currency, expiry, strike, right
     contract.m_right = right
     print ('* * * * REQUESTING MARKET DATA * * * *')
     con.reqMktData(tickId, contract, '', False)
-    sleep(3)
+    sleep(2)
     print ('* * * * CANCELING MARKET DATA * * * *')
     con.cancelMktData(tickId)
-    sleep(1)
+    sleep(0.1)
     con.disconnect()
 
 

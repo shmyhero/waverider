@@ -5,6 +5,7 @@ from utils.logger import Logger
 from dataaccess.symbols import Symbols
 from dataaccess.db import YahooEquityDAO
 from common.tradetime import TradeTime
+from ibbasic.api import API
 
 
 class AbstractHistoricalDataProvider(object):
@@ -45,4 +46,31 @@ class DBProvider(AbstractHistoricalDataProvider):
         start_time = datetime.datetime(from_date.year, from_date.month, from_date.day, 0, 0)
         rows = YahooEquityDAO().get_min_time_and_price(yahoo_symbol, start_time, end_time)
         return rows[-window:]
+
+
+class IBProvider(AbstractHistoricalDataProvider):
+
+    def __init__(self, logger=Logger(__name__, None)):
+        self.logger = logger
+        self.api = API()
+
+    def history(self, symbol, field, window):
+        fields_dic = {'open': 1, 'close': 4, 'high': 2, 'low': 3,
+                      'price': 4, 'unadj': 4}
+        results = self.api.get_historical_data(symbol, window, 'day')
+        return map(lambda x: [x[0], x[fields_dic[field]]], results)
+
+    def history_min(self, symbol, window):
+        days_window = window/390 + 1
+        records = self.api.get_historical_data(symbol, days_window, 'min')
+        results = []
+        for record in records[-window:]:
+            tradetime = record[0]
+            if tradetime.hour == 9 and tradetime.minute == 30 and tradetime.second == 0:
+                tradetime = datetime.datetime(tradetime.year, tradetime.month, tradetime.day, 9, 30, 1)
+            close = record[4]
+            results.append([tradetime, close])
+        return results
+
+
 

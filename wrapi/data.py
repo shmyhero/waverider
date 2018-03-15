@@ -1,7 +1,8 @@
+import traceback
 import pandas as pd
 from utils.logger import Logger
 from common.pathmgr import PathMgr
-from dataaccess.history import DBProvider
+from dataaccess.history import DBProvider, IBProvider
 from dataaccess.current import YahooScraper, MarketWatchScraper, IBCurrent
 
 
@@ -9,8 +10,25 @@ class Data(object):
 
     def __init__(self):
         self.logger = Logger(__name__, PathMgr.get_log_path())
-        self.historical_data_provider = DBProvider()
+        self.historical_data_provider_lst = [IBProvider(), DBProvider()]
         self.current_data_provider_lst = [IBCurrent(), YahooScraper(), MarketWatchScraper()]
+
+    def _get_history_daily(self, symbol, field, window):
+        for provider in self.historical_data_provider_lst:
+            try:
+                return provider.history(symbol, field, window)
+            except Exception as e:
+                self.logger.error('Trace: ' + traceback.format_exc(), True)
+                self.logger.error('Error: get current price from Yahoo failed:' + str(e))
+
+    def _get_history_min(self, symbol, window):
+        for provider in self.historical_data_provider_lst:
+            try:
+                return provider.history_min(symbol, window)
+            except Exception as e:
+                self.logger.error('Trace: ' + traceback.format_exc(), True)
+                self.logger.error('Error: get current price from Yahoo failed:' + str(e))
+
 
     def history(self, assets, field='price', window=30, frequency='1d'):
         """
@@ -27,10 +45,10 @@ class Data(object):
             for symbol in assets:
                 columns.append(symbol)
                 if frequency == '1d':
-                    rows = self.historical_data_provider.history(symbol, field, window)
+                    rows = self._get_history_daily(symbol, field, window)
                 elif frequency == '1m':
                     columns[0] = 'minute'
-                    rows = self.historical_data_provider.history_min(symbol, window)
+                    rows = self._get_history_min(symbol, window)
                 if results is None:
                     results = map(list, rows)
                 else:
@@ -42,9 +60,9 @@ class Data(object):
         else:
             symbol = str(assets)
             if frequency == '1d':
-                rows = self.historical_data_provider.history(symbol, field, window)
+                rows = self._get_history_daily(symbol, field, window)
             elif frequency == '1m':
-                rows = self.historical_data_provider.history_min(symbol, window)
+                rows = self._get_history_min(symbol, window)
             if len(rows) > window:
                 rows = rows[:window]
             series = pd.Series(map(lambda x: x[1], rows), index=map(lambda x: x[0], rows))
@@ -69,14 +87,17 @@ class Data(object):
 
 if __name__ == '__main__':
     data = Data()
-    result = data.history(['SPY', 'QQQ'], field='close', window=1)
-    print result
-    print type(result)
-    result = data.history('QQQ', field='close', window=100)
-    print result
-    print result[0]
+    # result = data.history(['SPY', 'QQQ'], field='close', window=1)
+    # print result
+    # print type(result)
+    # result = data.history('QQQ', field='close', window=100)
+    # print result
+    # print result[0]
+    from pandas import Timestamp
     dt = data.history('SVXY', window=1000, frequency='1m')
-    print dt.resample('30T').last()
+    # dt.index = [Timestamp(x, tz='US/Eastern') for x in dt.index]
+    # dt.index = [Timestamp(x, tz='UTC') for x in dt.index]
+    print dt.resample('30T', closed='right', label='right').last().dropna()
     # print data.history('SPX')
     #print data.history(['SPY', 'VIX'], window=252)
     # print data.current(['SPY', 'QQQ', 'VIX', 'NDX'])

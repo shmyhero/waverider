@@ -1,3 +1,6 @@
+import datetime
+import pytz
+from utils.timezonehelper import get_delta_hour_to_us_east
 from utils.iohelper import read_file_to_string, write_to_file
 from utils.logger import Logger
 from utils.shell import Shell
@@ -107,7 +110,33 @@ class API(object):
             middle_index = len(prices)/2
             return prices[middle_index]
         else:
-            raise Exception('Unable to get market price...')
+            raise Exception('Unable to get market price from IB...')
+
+    def parse_historical_data(self, line, delta_hour=None):
+        time_str = string_fetch(line, 'date=', ',')
+        if delta_hour:  # min data
+            trade_time = datetime.datetime.strptime(time_str, '%Y%m%d %H:%M:%S')-delta_hour
+        else:  # daily data
+            trade_time = datetime.datetime.strptime(time_str, '%Y%m%d').date()
+        open = float(string_fetch(line, 'open=', ','))
+        high = float(string_fetch(line, 'high=', ','))
+        low = float(string_fetch(line, 'low=', ','))
+        close = float(string_fetch(line, 'close=', ','))
+        return [trade_time, open, high, low, close]
+
+    def get_historical_data(self, symbol, days, barsize):
+        output = self.run_cmd('history', [symbol, days, barsize])
+        if 'errorCode=162' in output:
+            output = self.run_cmd('history', [symbol, days, barsize])
+        items = output.split('<historicalData')
+        if len(items) > 1:
+            if barsize == 'min':
+                delta_hour = get_delta_hour_to_us_east()
+                return map(lambda x: self.parse_historical_data(x, delta_hour), items[1:-1])
+            else:
+                return map(self.parse_historical_data, items[1:-1])
+        else:
+            raise Exception('Unable to get historical price from IB...')
 
     def cancel_order(self, order_id):
         output = self.run_cmd('cancel_order', [order_id])
@@ -120,8 +149,10 @@ class API(object):
 
 if __name__ == '__main__':
     # print API().get_portfolio_info()
-    #print API.get_order_id()
-    print API().get_market_price('GOOG')
+    # print API.get_order_id()
+    # print API().get_market_price('GOOG')
     #print API().get_market_price('SPY', 'OPT', strike=258, expiry='20171215', action='CALL')
+    print API().get_historical_data('SPY', '20', 'day')
+    # print API().get_historical_data('SPY', '5', 'min')
 
 

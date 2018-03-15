@@ -1,6 +1,7 @@
 import datetime
 import pytz
 from utils.logger import DailyLoggerFactory
+from utils.timezonehelper import convert_to_us_east_dt
 from common.pathmgr import PathMgr
 from wrapi.context import Context
 from wrapi.data import Data
@@ -17,10 +18,7 @@ class ScheduleFunction(object):
         self.time_rule = time_rule
 
     def run(self, current_time):
-        native_dt = datetime.datetime.now()
-        us_dt = datetime.datetime.now(pytz.timezone('US/Eastern'))
-        delta_hour = datetime.datetime(native_dt.year, native_dt.month, native_dt.day, native_dt.hour, native_dt.minute, 0) - datetime.datetime(us_dt.year, us_dt.month, us_dt.day, us_dt.hour, us_dt.minute, 0)
-        dt = current_time - delta_hour
+        dt = convert_to_us_east_dt(current_time)
         # if you want to run the schedule function immediately,
         # you would need to add below 2 line code, given the correct time interval.
         # dt += datetime.timedelta(hours=12, minutes=33)

@@ -32,11 +32,12 @@ if __name__ == '__main__':
     # context.abc = 1
     # print context.abc
     data = Data()
-    # print data.history('SVXY',  window=10, frequency='1m')
+    s = data.history('SVXY',  window=390, frequency='1m')
+    print s.first_valid_index().to_pydatetime().second
     # print data.history('SPY', 'close', 1, '1d')
     # print data.history(['SPY', 'VIX'], window=252)
     # print data.current(['SPY', 'VIX'])
-    print data.current(['SPY', 'QQQ'])
+    # print data.current(['SPY', 'QQQ'])
     # StrategyRunner.run('caa')
 
 
