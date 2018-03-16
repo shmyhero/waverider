@@ -65,7 +65,7 @@ class Container(object):
 
     @staticmethod
     def get_schedule_functions(strategy_name):
-        global_schedule_functions = [ScheduleFunction(lambda : PortfolioDAO.save_portfolio_info(strategy_name), EveryDayRule(), MarketCloseRule(-4))]
+        global_schedule_functions = [ScheduleFunction(lambda: PortfolioDAO.save_portfolio_info(strategy_name), EveryDayRule(), MarketCloseRule(-4))]
         return Container._schedule_function_dic[strategy_name] + global_schedule_functions
 
     @staticmethod

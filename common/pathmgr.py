@@ -50,7 +50,7 @@ class PathMgr(object):
     @staticmethod
     def get_strategies_portfolio_file(strategy_name):
         project_path = PathMgr.get_project_path()
-        return os.path.join(project_path, 'strategies', 'portfolio', '%s.csv' % strategy_name)
+        return os.path.join(project_path, 'strategies', 'portfolio', '%s.json' % strategy_name)
 
 
 

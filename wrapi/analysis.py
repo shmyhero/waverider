@@ -61,6 +61,7 @@ class PortfolioDAO(object):
         dic[date] = API().get_portfolio_info().to_dict()
         file_path = PathMgr.get_strategies_portfolio_file(strategy_name)
         ensure_parent_dir_exists(file_path)
+
         write_to_file(file_path, json.dumps(dic))
 
     @staticmethod
@@ -69,8 +70,8 @@ class PortfolioDAO(object):
         if os.path.exists(file_path):
             content = read_file_to_string(file_path)
             dic = json.loads(content)
-            for key in dic.keys():
-                dic[key] = Portfolio.from_dict(dic[key])
+            # for key in dic.keys():
+                # dic[key] = Portfolio.from_dict(dic[key])
             return dic
         else:
             return {}
