@@ -10,8 +10,10 @@ class Data(object):
 
     def __init__(self):
         self.logger = Logger(__name__, PathMgr.get_log_path())
-        self.historical_data_provider_lst = [IBProvider(), DBProvider()]
-        self.current_data_provider_lst = [IBCurrent(), YahooScraper(), MarketWatchScraper()]
+        # self.historical_data_provider_lst = [IBProvider(), DBProvider()]
+        # self.current_data_provider_lst = [IBCurrent(), YahooScraper(), MarketWatchScraper()]
+        self.historical_data_provider_lst = [DBProvider(), IBProvider()]
+        self.current_data_provider_lst = [YahooScraper(), MarketWatchScraper(), IBCurrent()]
 
     def _get_history_daily(self, symbol, field, window):
         for provider in self.historical_data_provider_lst:
@@ -94,10 +96,14 @@ if __name__ == '__main__':
     # print result
     # print result[0]
     from pandas import Timestamp
-    dt = data.history('SVXY', window=1000, frequency='1m')
-    # dt.index = [Timestamp(x, tz='US/Eastern') for x in dt.index]
-    # dt.index = [Timestamp(x, tz='UTC') for x in dt.index]
-    print dt.resample('30T', closed='right', label='right').last().dropna()
+
+    xiv_prices = data.history('SVXY', "price", 1440, "1m").resample('30T',
+                                                                         closed='right',
+                                                                         label='right').last().dropna()
+    xiv_prices.index = [Timestamp(x, tz='US/Eastern') for x in xiv_prices.index]
+    xiv_prices.index = [Timestamp(x, tz='UTC') for x in xiv_prices.index]
+
+    print xiv_prices
     # print data.history('SPX')
     #print data.history(['SPY', 'VIX'], window=252)
     # print data.current(['SPY', 'QQQ', 'VIX', 'NDX'])
