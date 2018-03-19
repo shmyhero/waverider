@@ -16,13 +16,13 @@ if __name__ == '__main__':
     # cancel_order(100253)
     # set_stop_price('SPY', 250)
 
-    # context = Context()
+    context = Context()
     # print context.portfolio
     # print context.portfolio.portfolio_value
     # print context.portfolio.positions_value
     # print context.portfolio.capital_used
     # print context.portfolio.positions
-    # print context.display_all()
+    print context.display_all()
     # print context.portfolio.positions['EFA']
     # print context.portfolio.positions['SPY'].symbol
     # print context.portfolio.positions['SPY'].amount
@@ -31,14 +31,19 @@ if __name__ == '__main__':
     # print context.portfolio.positions['SPY'].cost_basic
     # context.abc = 1
     # print context.abc
-    data = Data()
-    s = data.history('SVXY',  window=390, frequency='1m')
-    print s.first_valid_index().to_pydatetime().second
+    # data = Data()
+    # s = data.history('SVXY',  window=1440, frequency='1m')
+    # print s
+    # print s.first_valid_index().to_pydatetime().second
     # print data.history('SPY', 'close', 1, '1d')
     # print data.history(['SPY', 'VIX'], window=252)
     # print data.current(['SPY', 'VIX'])
     # print data.current(['SPY', 'QQQ'])
     # StrategyRunner.run('caa')
+    # n9 = ['LMT', 'MO', 'QQQ', 'DIA', 'EFA', 'EEM', 'HYG', 'IEF', 'BIL']
+    # n9 = ['HYG', 'IEF', 'BIL']
+    # df = data.history(n9, 'close', 260, '1d')
+    # print df
 
 
 

@@ -57,7 +57,7 @@ class API(object):
         if server_error_msg in output:
             items = output.split(server_error_msg)[1:]
             error_items = map(lambda x: [string_fetch(x, 'errorCode=', ','), string_fetch(x, 'errorMsg=', '>')], items)
-            ignore_error_codes = ['2104', '2106', '399']  # 399 for market not open
+            ignore_error_codes = ['2104', '2106', '2107', '399']  # 399 for market not open
             filtered_error_items = filter(lambda x: x[0] not in ignore_error_codes, error_items)
             if len(filtered_error_items) > 0:
                 exception_msg = str(map(lambda x: 'errorCode={}, errorMsg={}'.format(x[0], x[1]), filtered_error_items))
@@ -114,7 +114,7 @@ class API(object):
 
     def parse_historical_data(self, line, delta_hour=None):
         time_str = string_fetch(line, 'date=', ',')
-        if delta_hour:  # min data
+        if delta_hour is not None:  # min data
             trade_time = datetime.datetime.strptime(time_str, '%Y%m%d %H:%M:%S')-delta_hour
         else:  # daily data
             trade_time = datetime.datetime.strptime(time_str, '%Y%m%d').date()
@@ -130,6 +130,7 @@ class API(object):
             output = self.run_cmd('history', [symbol, days, barsize])
         items = output.split('<historicalData')
         if len(items) > 1:
+            # print len(items)-2
             if barsize == 'min':
                 delta_hour = get_delta_hour_to_us_east()
                 return map(lambda x: self.parse_historical_data(x, delta_hour), items[1:-1])

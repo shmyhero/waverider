@@ -14,3 +14,8 @@ def convert_to_us_east_dt(current_time):
     delta_hour = get_delta_hour_to_us_east()
     dt = current_time - delta_hour
     return dt
+
+if __name__ == '__main__':
+    delta = get_delta_hour_to_us_east()
+    if delta:
+        print delta
