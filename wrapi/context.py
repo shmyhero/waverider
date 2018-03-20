@@ -20,8 +20,19 @@ class Context(object):
     def display_all(self):
         # positions = '\r\n'.join(self.portfolio.positions_amounts)
         positions = '\n\r'
-        for k,v in self.portfolio.positions_amounts:
-            positions = positions + k + ':\t'+ str(v) + '\n\r'
+        for k, v in self.portfolio.positions_amounts:
+            if len(k) > 15:
+                underlying = k[0:-15]
+                exp_date = datetime.datetime.strptime(k[-15:-9],'%y%m%d')
+                if k[-9] == 'C':
+                    call_or_put = 'Call'
+                else:
+                    call_or_put = 'Put'
+                strike_price = float(k[-8:])/1000
+                symbol = '%s, %s, %s %s' %(underlying, exp_date.strftime('%Y-%m-%d'), strike_price, call_or_put)
+            else:
+                symbol = k
+            positions = positions + symbol + ':\t'+ str(v) + '\n\r'
 
         content = ['portfolio value:%s' % self.portfolio.portfolio_value,
                    'position value: %s' % self.portfolio.positions_value,

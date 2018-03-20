@@ -21,7 +21,7 @@ class Data(object):
                 return provider.history(symbol, field, window)
             except Exception as e:
                 self.logger.error('Trace: ' + traceback.format_exc(), True)
-                self.logger.error('Error: get current price from Yahoo failed:' + str(e))
+                self.logger.error('Error: get historical daily data failed:' + str(e))
 
     def _get_history_min(self, symbol, window):
         for provider in self.historical_data_provider_lst:
@@ -29,8 +29,7 @@ class Data(object):
                 return provider.history_min(symbol, window)
             except Exception as e:
                 self.logger.error('Trace: ' + traceback.format_exc(), True)
-                self.logger.error('Error: get current price from Yahoo failed:' + str(e))
-
+                self.logger.error('Error: get historical minutes data failed:' + str(e))
 
     def history(self, assets, field='price', window=30, frequency='1d'):
         """

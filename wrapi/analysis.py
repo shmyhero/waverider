@@ -2,6 +2,8 @@ import datetime
 import pytz
 import os
 import json
+import math
+import numpy as np
 from utils.iohelper import read_file_to_string, append_to_file, write_to_file, ensure_parent_dir_exists
 from common.pathmgr import PathMgr
 from wrapi.order import OrderStyle
@@ -82,11 +84,93 @@ class Analysis(object):
     def __init__(self, strategy_name):
         self.strategy_name = strategy_name
         self.trade_trace = TradeRecordDAO.read_trade_trace(strategy_name)
+        self.portfolio_info = PortfolioDAO.read_porfolio_info(strategy_name)
+        self.net_liquidations = self.get_netliquidations()
+        self.returns = self.get_returns()
+        spy_values = Data().history('SPY', window=len(self.net_liquidations)).values
+        self.bench_mark_returns = self.get_returns(spy_values)
+
+    def get_netliquidations(self):
+        records = []
+        for k, v in self.portfolio_info.iteritems():
+            date = datetime.datetime.strptime(k, '%Y-%m-%d')
+            value = v['net_liquidation']
+            records.append([date, value])
+        records.sort(key=lambda x: x[0])
+        return records
+
+    def get_returns(self, values=None):
+        if values is None:
+            values = map(lambda x: x[1], self.net_liquidations)
+        base = values[0]
+        return map(lambda x: x/base, values)
+
+    def get_start_date(self):
+        return self.net_liquidations[0][0]
+
+    def get_end_date(self):
+        return self.net_liquidations[-1][0]
+
+    def get_total_month(self):
+        return self.get_end_date().month - self.get_start_date().month
+
+    def get_cumulative_return(self, returns=None):
+        if returns is None:
+            returns = self.get_returns()
+        return returns[-1] -1
+
+    def get_annual_return(self, returns=None):
+        cumulative_return = self.get_cumulative_return(returns)
+        days = (self.get_end_date() - self.get_start_date()).days
+        return pow(1+cumulative_return, 252.0/days)-1
+
+    def get_annual_volatility(self):
+        values = map(lambda x: x[1], self.net_liquidations)
+        return math.sqrt(252) * np.std(np.diff(np.log(values)))
+
+    def get_sharpe_ratio(self):
+        values = map(lambda x: x-1, self.get_returns())
+        return np.mean(values) / np.std(np.diff(values))
+
+    def get_max_draw_down(self):
+        max_value = -1
+        max_draw_down = 0
+        from_date = None
+        end_date = None
+        for [date, value] in self.net_liquidations:
+            if value > max_value:
+                max_value = value
+                from_date = date
+            else:
+                draw_down = (max_value - value*1.0)/max_value
+                if draw_down > max_draw_down:
+                    max_draw_down = draw_down
+                    end_date = date
+        return [max_draw_down, from_date, end_date]
+
+    def get_beta(self):
+        covariance = np.cov(self.bench_mark_returns, self.returns)
+        beta = covariance[0, 1] / covariance[1, 1]
+        return beta
+
+    def get_alpha(self, beta):
+        if beta is None:
+            beta = self.get_beta()
+        bench_mark_annual_return = self.get_annual_return(self.bench_mark_returns)
+        return (self.get_annual_return()+1)/(+ bench_mark_annual_return + 1)/beta
 
 
 if __name__ == '__main__':
-    # for trade_record in read_trade_trace('a'):
-    #     print trade_record
-    # pass
-    PortfolioDAO.save_portfolio_info('a')
+    # print PortfolioDAO.read_portfolio_info('a')
+    # PortfolioDAO.save_portfolio_info('a')
+    analysis = Analysis('a')
+    print analysis.get_cumulative_return()
+    print analysis.get_annual_return()
+    print analysis.get_max_draw_down()
+    print analysis.get_annual_volatility()
+    print analysis.get_sharpe_ratio()
+    beta = analysis.get_beta()
+    print beta
+    alpha = analysis.get_alpha(beta)
+    print alpha
 

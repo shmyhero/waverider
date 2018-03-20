@@ -21,7 +21,7 @@ if __name__ == '__main__':
     # print context.portfolio.portfolio_value
     # print context.portfolio.positions_value
     # print context.portfolio.capital_used
-    # print context.portfolio.positions
+    print context.portfolio.positions
     print context.display_all()
     # print context.portfolio.positions['EFA']
     # print context.portfolio.positions['SPY'].symbol

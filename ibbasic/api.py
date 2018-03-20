@@ -29,7 +29,8 @@ class API(object):
 
     @staticmethod
     def parse_contract(content):
-        symbol = string_fetch(content, '\'m_symbol\': \'', '\'')
+        symbol = string_fetch(content, 'm_localSymbol\': \'', '\'')
+        symbol = symbol.replace(' ', '')
         quantity = int(string_fetch(content, 'position=', ','))
         market_price = float(string_fetch(content, 'marketPrice=', ','))
         cost_price = float(string_fetch(content, 'averageCost=', ','))
