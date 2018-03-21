@@ -38,7 +38,8 @@ class API(object):
 
     @staticmethod
     def parse_order(content):
-        symbol = string_fetch(content, 'm_symbol\': \'', '\'')
+        symbol = string_fetch(content, 'm_localSymbol\': \'', '\'')
+        symbol = symbol.replace(' ', '')
         order_id = string_fetch(content, 'orderId=', ',')
         action = string_fetch(content, 'm_action\': \'', '\'')
         quantity = string_fetch(content, 'm_totalQuantity\': ', ',')
@@ -87,6 +88,7 @@ class API(object):
         items = output.split('<openOrder ')
         if len(items) > 0:
             orders = map(API.parse_order, items[1:])
+            orders = filter(lambda x: len(x[1]) < 15, orders)
         else:
             orders = []
         return orders
