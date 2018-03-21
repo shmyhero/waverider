@@ -59,15 +59,14 @@ class PortfolioDAO(object):
     @staticmethod
     def save_portfolio_info(strategy_name):
         date = datetime.datetime.now(tz=pytz.timezone('US/Eastern')).strftime('%Y-%m-%d')
-        dic = PortfolioDAO.read_porfolio_info(strategy_name)
+        dic = PortfolioDAO.read_portfolio_info(strategy_name)
         dic[date] = API().get_portfolio_info().to_dict()
         file_path = PathMgr.get_strategies_portfolio_file(strategy_name)
         ensure_parent_dir_exists(file_path)
-
-        write_to_file(file_path, json.dumps(dic))
+        write_to_file(file_path, json.dumps(dic, indent=4, sort_keys=True))
 
     @staticmethod
-    def read_porfolio_info(strategy_name):
+    def read_portfolio_info(strategy_name):
         file_path = PathMgr.get_strategies_portfolio_file(strategy_name)
         if os.path.exists(file_path):
             content = read_file_to_string(file_path)
@@ -84,7 +83,7 @@ class Analysis(object):
     def __init__(self, strategy_name):
         self.strategy_name = strategy_name
         self.trade_trace = TradeRecordDAO.read_trade_trace(strategy_name)
-        self.portfolio_info = PortfolioDAO.read_porfolio_info(strategy_name)
+        self.portfolio_info = PortfolioDAO.read_portfolio_info(strategy_name)
         self.net_liquidations = self.get_netliquidations()
         self.returns = self.get_returns()
         spy_values = Data().history('SPY', window=len(self.net_liquidations)).values
@@ -161,16 +160,16 @@ class Analysis(object):
 
 
 if __name__ == '__main__':
-    # print PortfolioDAO.read_portfolio_info('a')
-    # PortfolioDAO.save_portfolio_info('a')
-    analysis = Analysis('a')
-    print analysis.get_cumulative_return()
-    print analysis.get_annual_return()
-    print analysis.get_max_draw_down()
-    print analysis.get_annual_volatility()
-    print analysis.get_sharpe_ratio()
-    beta = analysis.get_beta()
-    print beta
-    alpha = analysis.get_alpha(beta)
-    print alpha
+    print PortfolioDAO.read_portfolio_info('a')
+    PortfolioDAO.save_portfolio_info('a')
+    # analysis = Analysis('a')
+    # print analysis.get_cumulative_return()
+    # print analysis.get_annual_return()
+    # print analysis.get_max_draw_down()
+    # print analysis.get_annual_volatility()
+    # print analysis.get_sharpe_ratio()
+    # beta = analysis.get_beta()
+    # print beta
+    # alpha = analysis.get_alpha(beta)
+    # print alpha
 
