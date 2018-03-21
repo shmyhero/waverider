@@ -82,13 +82,14 @@ class API(object):
             contract_dict = {}
         return Portfolio(available_funds, net_liquidation, contract_dict)
 
-    def get_open_orders(self):
+    def get_open_orders(self, include_option=False):
         output = self.run_cmd('get_open_orders')
         # print output
         items = output.split('<openOrder ')
         if len(items) > 0:
             orders = map(API.parse_order, items[1:])
-            orders = filter(lambda x: len(x[1]) < 15, orders)
+            if not include_option:
+                orders = filter(lambda x: len(x[1]) < 15, orders)
         else:
             orders = []
         return orders

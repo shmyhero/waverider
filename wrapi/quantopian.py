@@ -146,14 +146,14 @@ def order_target_percent(asset, percent, style=OrderStyle.MarketOrder, sec_type=
                                       lambda x, y: TradeRecordDAO.write_trade_trace(Container.current_strategy, x, y, style))
 
 
-def get_open_orders(asset=None):
+def get_open_orders(asset=None, include_option=False):
     """
     Return a dataframe for orders, If asset is None or not specified, returns all open orders.
     If asset is specified, returns open orders for that asset
     :param asset: filter the open orders by specified asset
     :return: a dataframe for open orders
     """
-    return Order.get_open_orders(asset)
+    return Order.get_open_orders(asset, include_option)
 
 
 def cancel_order(order_id):

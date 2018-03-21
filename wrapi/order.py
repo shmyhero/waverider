@@ -54,8 +54,8 @@ class Order(object):
             raise Exception('The cost of asset exceed total cash...')
 
     @staticmethod
-    def get_open_orders(asset=None):
-        orders = API().get_open_orders()
+    def get_open_orders(asset=None, include_option=False):
+        orders = API().get_open_orders(include_option)
         if asset:
             orders = filter(lambda x: x[1] == asset, orders)
         rows = map(lambda x: x[1:], orders)
