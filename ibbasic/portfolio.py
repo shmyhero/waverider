@@ -30,7 +30,7 @@ class Positions(MutableMapping):
         if key in self._storage.keys():
             return self._storage[key]
         else:
-            return 0
+            return Position(key, 0, 0, 0)
 
     def __setitem__(self, key, value):
         self._storage[key] = value

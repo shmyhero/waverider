@@ -24,7 +24,7 @@ class Order(object):
         pass
 
     @staticmethod
-    def order_target(asset, amount, style=OrderStyle.MarketOrder, sec_type='STK', trade_trace_fn=None):
+    def order(asset, amount, style=OrderStyle.MarketOrder, sec_type='STK', trade_trace_fn=None):
         # if trade_trace_fn is not None:
         #     trade_trace_fn(asset, amount)
         [order_type, price] = style
@@ -34,24 +34,33 @@ class Order(object):
             return API().order(asset, sec_type, order_type, -amount, 'SELL', price)
         else:
             pass
-        if trade_trace_fn is not None:
+        if trade_trace_fn is not None and amount != 0:
             trade_trace_fn(asset, amount)
 
     @staticmethod
-    def order_target_percent(asset, percent, style=OrderStyle.MarketOrder, sec_type='STK', trade_trace_fn=None):
+    def order_target(asset, amount, style=OrderStyle.MarketOrder, sec_type='STK', trade_trace_fn=None):
         portfolio = API().get_portfolio_info()
-        current_percent = portfolio.get_percentage(asset)
-        order_cash = (percent - current_percent) * portfolio.net_liquidation
-        if order_cash < portfolio.available_funds:
-            try:
-                market_price = API().get_market_price(asset)
-            except Exception:
-                from wrapi.data import Data
-                market_price = Data().current(asset)
-            amount = int(round(order_cash/market_price))
-            return Order.order_target(asset, amount, style, sec_type, trade_trace_fn)
+        delta_amount = amount-portfolio.positions[asset].amount
+        return Order.order(asset, delta_amount, style, sec_type, trade_trace_fn)
+
+    @staticmethod
+    def order_target_percent(asset, percent, style=OrderStyle.MarketOrder, sec_type='STK', trade_trace_fn=None):
+        if percent == 0:
+            Order.order_target(asset, 0, style, sec_type, trade_trace_fn)
         else:
-            raise Exception('The cost of asset exceed total cash...')
+            portfolio = API().get_portfolio_info()
+            current_percent = portfolio.get_percentage(asset)
+            order_cash = (percent - current_percent) * portfolio.net_liquidation
+            if order_cash < portfolio.available_funds:
+                try:
+                    market_price = API().get_market_price(asset)
+                except Exception:
+                    from wrapi.data import Data
+                    market_price = Data().current(asset)
+                amount = int(round(order_cash/market_price))
+                return Order.order(asset, amount, style, sec_type, trade_trace_fn)
+            else:
+                raise Exception('The cost of asset exceed total cash...')
 
     @staticmethod
     def get_open_orders(asset=None, include_option=False):
@@ -74,8 +83,8 @@ class Order(object):
 
 if __name__ == '__main__':
     # API related functions below:
-    #print get_open_orders()
-    Order.order_target('SPY', 10)
+    print Order.get_open_orders()
+    # Order.order_target('SPY', 10)
     #order_target_percent('AAPL', 0.01)
     #order_target('QQQ', 30, style=OrderStyle.MarketOrder)
     #order_target('SPY', 12, style=OrderStyle.StopOrder(249.0))

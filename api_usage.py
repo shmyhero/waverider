@@ -6,23 +6,25 @@ from wrapi.strategy_runner import StrategyRunner
 # this file is used for testing any wrapi, feel free to modify it..
 
 if __name__ == '__main__':
+    print get_open_orders(include_option=True)
     # print get_open_orders()
-    # print get_open_orders('SPY')
+    # print get_open_orders('SVXY')
     # order_target('SPY', 10, OrderStyle.LimitOrder(260))
     # order_target('QQQ', -12)
-    # order_target_percent('SPY', 0)
+    # order_target_percent('QQQ', 0)
     # order_target('QQQ', 31, style=OrderStyle.MarketOrder)
     # order_target('SPY', -6, style=OrderStyle.LimitOrder(258.0))
-    # cancel_order(100253)
+    # cancel_order(53)
     # set_stop_price('SPY', 250)
 
-    context = Context()
+    # context = Context()
     # print context.portfolio
     # print context.portfolio.portfolio_value
     # print context.portfolio.positions_value
     # print context.portfolio.capital_used
-    print context.portfolio.positions
-    print context.display_all()
+    # print context.portfolio.positions['VNM'].amount
+    # print context.portfolio.positions['QQQ'].amount
+    # print context.display_all()
     # print context.portfolio.positions['EFA']
     # print context.portfolio.positions['SPY'].symbol
     # print context.portfolio.positions['SPY'].amount

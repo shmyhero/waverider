@@ -65,7 +65,7 @@ class API(object):
                 exception_msg = str(map(lambda x: 'errorCode={}, errorMsg={}'.format(x[0], x[1]), filtered_error_items))
                 raise Exception(exception_msg)
 
-    def get_portfolio_info(self):
+    def get_portfolio_info(self, include_option=False):
         output = self.run_cmd('account')
         if output == '':
             raise Exception('Failed to get account info, please check the IB gateway, config, network and ibpy2 packages, etc...')
@@ -77,7 +77,11 @@ class API(object):
         net_liquidation = float(str_net_liquidation)
         items = output.split('<updatePortfolio')
         if len(items) > 0:
-            contract_dict = list_to_hash(map(API.parse_contract, items[1:]))
+            contract_list = map(API.parse_contract, items[1:])
+            if include_option:
+                contract_dict = list_to_hash(contract_list)
+            else:
+                contract_dict = list_to_hash(filter(lambda x: len(x) <= 15, contract_list))
         else:
             contract_dict = {}
         return Portfolio(available_funds, net_liquidation, contract_dict)
