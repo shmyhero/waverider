@@ -81,7 +81,7 @@ class API(object):
             if include_option:
                 contract_dict = list_to_hash(contract_list)
             else:
-                contract_dict = list_to_hash(filter(lambda x: len(x) <= 15, contract_list))
+                contract_dict = list_to_hash(filter(lambda x: len(x[0]) <= 15, contract_list))
         else:
             contract_dict = {}
         return Portfolio(available_funds, net_liquidation, contract_dict)
