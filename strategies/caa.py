@@ -5,43 +5,40 @@ import traceback
 import time
 from common.tradetime import TradeTime
 
+'''
+20180328 low vol feature
+1, change tv from 0.08 to 0.10
+2, change stocks to low vol stocks
+3, change stocks ratios
+
+'''
 
 def initialize(context):
-    context.caa_tv = 0.08  # Target annual volatility
-    context.caa_total_ratio = 0.5
-    context.spy = symbol('SPY')  # SPY
-    # context.caa_stocks = symbols('SPY', 'QQQ',  'EFA',  'EEM',  'EWJ',  'HYG',  'IEF',  'BIL')  # N-8 Universe
-    # context.caa_lower_bounds = [[0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00]]
-    # context.caa_upper_bounds = [[0.25], [0.25], [0.25], [0.25], [0.25], [0.25], [1.00], [1.00]]
+    context.caa_tv = 0.10  # Target annual volatility
+    context.caa_total_ratio = 1.0
+    n9 = ['LMT','MO','VHT','IHI','MA','V','ITA','CME','IEF','BIL']
+    context.caa_stocks = n9  # Universe
+    n = len(context.caa_stocks)
+    context.caa_lower_bounds = np.array([0.00] * n).reshape((n, 1))
+    context.caa_upper_bounds = np.append(np.array([0.20] * (n - 2)).reshape((n - 2, 1)), [[1.0], [1.0]], axis=0)
 
-    context.caa_stocks = symbols('SSO', 'QQQ', 'EFA', 'AAXJ', 'EWJ', 'HYG', 'IEF', 'BIL')  # N-8 Universe ['SSO', 'BIL']
-    context.caa_lower_bounds = [[0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00], [0.00]]
-    context.caa_upper_bounds = [[0.25], [0.25], [0.25], [0.25], [0.25], [0.25], [1.00], [1.00]]
 
     schedule_function(caa_rebalance,
-                      date_rules.every_day(),
-                      time_rules.market_open(minutes=31))
-
-    schedule_function(display_all,
-                      date_rules.every_day(),
-                      time_rules.market_open(minutes=0))
+                      date_rules.month_end(),
+                      time_rules.market_close(minutes=15))
 
 
 def handle_data(context, data):
-    now = data.current(context.spy)
-    time.sleep(1) # to see whether it need time between two data request.
-    last = data.history(context.spy, 'close', 2, '1d')[0]
-    pct = (now - last) / last
-    log.info('%s \t %s' % (round(pct,3), time.asctime()))
-    time.sleep(1)
-
-
-def display_all(context, data):
-    log.info(context.display_all())
-
+    try:
+        log.info(context.display_all())
+        caa_rebalance(context, data)
+        context.end()
+    except Exception as e:
+        log.error('Error in handle_data: ' + str(e))
+        traceback.print_exc()
 
 def caa_rebalance(context, data):
-    prices = data.history(context.caa_stocks, 'price', 252, '1d').dropna()
+    prices = data.history(context.caa_stocks, 'price', 260, '1d').dropna()
     N = len(context.caa_stocks)
     R = np.log(prices).diff().dropna()
     covar = R.cov().values
@@ -61,30 +58,24 @@ def caa_rebalance(context, data):
         cla.solve()
         weights = pd.Series(getWeights(cla, context.caa_tv).flatten(), index=R.columns)
         for stock in weights.index:
-            # print weights[stock]
-            log.info(stock + ':\t\t' + str(round(weights[stock], 3)))
             if stock not in ['BIL']:
                 percent = round(weights[stock], 3) * context.caa_total_ratio
-                log.info('order_target_percent {} {}'.format(stock, percent))
-                # order_target_percent(stock, percent)
                 order_target_ratio(context, data, stock, percent)
     except Exception as e:
-        # Reset the trade date to try again on the next bar
         log.error('Trace: ' + traceback.format_exc())
         log.error(str(e))
 
 
 # Replacement of order_target_percent
 def order_target_ratio(context, data, stock, ratio):
+    if not TradeTime.is_market_open():
+        log.warning( 'Market is not opened, order canceled : ' + stock + ' : ' + str(ratio))
+        return
     if len(get_open_orders(stock)) != 0:
         log.warning('There are remained orders for stock : ' + stock + ', order canceled.')
         return
-    if not TradeTime.is_market_open():
-        print time.asctime()
-        log.warning('Market is not opened, order canceled : ' + str(stock) + ' : ' + str(ratio))
-        return
     order_target_percent(stock, ratio)
-    log.info('%s : ratio %s ' % (stock, str(round(ratio, 2))))
+    log.info('%s ratio : %s ' % (stock, str(round(ratio, 2))))
 
 
 def getWeights(cla, tv):
