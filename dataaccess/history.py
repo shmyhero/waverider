@@ -38,13 +38,13 @@ class DBProvider(AbstractHistoricalDataProvider):
         return rows
 
     def history_min(self, symbol, window):
-        yahoo_symbol = Symbols.get_mapped_symbol(symbol, Symbols.YahooSymbolMapping)
+        # yahoo_symbol = Symbols.get_mapped_symbol(symbol, Symbols.YahooSymbolMapping)
         us_dt = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
         end_time = datetime.datetime(us_dt.year, us_dt.month, us_dt.day, us_dt.hour, us_dt.minute, us_dt.second)
         days_window = window/391 + 1
         from_date = TradeTime.get_from_date_by_window(days_window)
         start_time = datetime.datetime(from_date.year, from_date.month, from_date.day, 0, 0)
-        rows = YahooEquityDAO().get_min_time_and_price(yahoo_symbol, start_time, end_time)
+        rows = YahooEquityDAO().get_min_time_and_price(symbol, start_time, end_time)
         return rows[-window:]
 
 

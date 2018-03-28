@@ -70,11 +70,11 @@ class YahooEquityDAO(BaseDAO):
         rows = self.select(query)
         return rows
 
-    def get_realtime_time_and_price(self, symbol='XIV', start_time=datetime.datetime(1971, 1, 1, 0, 0, 0), end_time=datetime.datetime(9999, 1, 1, 0, 0, 0)):
+    def get_realtime_time_and_price(self, symbol='SVXY', start_time=datetime.datetime(1971, 1, 1, 0, 0, 0), end_time=datetime.datetime(9999, 1, 1, 0, 0, 0)):
         query = """select tradeTime, price from equity_realtime where tradeTime >= '{}' and tradeTime <= '{}' and symbol = '{}' order by tradeTime """.format(start_time, end_time, symbol)
         return self.select(query)
 
-    def get_min_time_and_price(self, symbol='XIV', start_time=datetime.datetime(1971, 1, 1, 0, 0, 0), end_time=datetime.datetime(9999, 1, 1, 0, 0, 0)):
+    def get_min_time_and_price_from_realtime(self, symbol='SVXY', start_time=datetime.datetime(2018, 2, 7, 9, 30, 0), end_time=datetime.datetime(9999, 1, 1, 0, 0, 0)):
         rows = self.get_realtime_time_and_price(symbol, start_time, end_time)
         new_rows = []
         last_min = -1
@@ -84,4 +84,17 @@ class YahooEquityDAO(BaseDAO):
                 last_min = trade_time.minute
                 new_rows.append(row)
         return new_rows
+
+    def get_min_time_and_price_from_min(self, symbol, start_time=datetime.datetime(1971, 1, 1, 0, 0, 0), end_time=datetime.datetime(9999, 1, 1, 0, 0, 0)):
+        query = """select tradeTime, closePrice from equity_min where tradeTime >= '{}' and tradeTime <= '{}' and symbol = '{}' order by tradeTime """.format(
+            start_time, end_time, symbol)
+        rows = self.select(query)
+        return rows
+
+    def get_min_time_and_price(self, symbol, start_time=datetime.datetime(1971, 1, 1, 0, 0, 0), end_time=datetime.datetime(9999, 1, 1, 0, 0, 0)):
+        if symbol == 'SVXY' and start_time >= datetime.datetime(2018, 2, 7, 9, 30, 0):
+            return self.get_min_time_and_price_from_realtime('SVXY', start_time, end_time)
+        else:
+            return self.get_min_time_and_price_from_min(symbol, start_time, end_time)
+
 

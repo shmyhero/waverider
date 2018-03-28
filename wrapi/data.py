@@ -1,7 +1,8 @@
 import traceback
 import pandas as pd
-from utils.logger import Logger
+from utils.logger import DailyLoggerFactory
 from common.pathmgr import PathMgr
+from common.tradetime import TradeTime
 from dataaccess.history import DBProvider, IBProvider
 from dataaccess.current import YahooScraper, MarketWatchScraper, IBCurrent
 
@@ -9,27 +10,29 @@ from dataaccess.current import YahooScraper, MarketWatchScraper, IBCurrent
 class Data(object):
 
     def __init__(self):
-        self.logger = Logger(__name__, PathMgr.get_log_path())
         # self.historical_data_provider_lst = [IBProvider(), DBProvider()]
         # self.current_data_provider_lst = [IBCurrent(), YahooScraper(), MarketWatchScraper()]
         self.historical_data_provider_lst = [DBProvider(), IBProvider()]
         self.current_data_provider_lst = [YahooScraper(), MarketWatchScraper(), IBCurrent()]
+
+    def get_logger(self):
+        return DailyLoggerFactory.get_logger(__name__, PathMgr.get_log_path())
 
     def _get_history_daily(self, symbol, field, window):
         for provider in self.historical_data_provider_lst:
             try:
                 return provider.history(symbol, field, window)
             except Exception as e:
-                self.logger.error('Trace: ' + traceback.format_exc(), True)
-                self.logger.error('Error: get historical daily data failed:' + str(e))
+                self.get_logger().error('Trace: ' + traceback.format_exc(), True)
+                self.get_logger().error('Error: get historical daily data failed:' + str(e))
 
     def _get_history_min(self, symbol, window):
         for provider in self.historical_data_provider_lst:
             try:
                 return provider.history_min(symbol, window)
             except Exception as e:
-                self.logger.error('Trace: ' + traceback.format_exc(), True)
-                self.logger.error('Error: get historical minutes data failed:' + str(e))
+                self.get_logger().error('Trace: ' + traceback.format_exc(), True)
+                self.get_logger().error('Error: get historical minutes data failed:' + str(e))
 
     def history(self, assets, field='price', window=30, frequency='1d'):
         """
@@ -85,6 +88,22 @@ class Data(object):
         else:
             return None
 
+
+class BackTestData(object):
+
+    def __init__(self):
+        self.logger = DailyLoggerFactory.get_logger(__name__, PathMgr.get_log_path('BackTest'))
+        self.specified_date = TradeTime.get_latest_trade_date()
+        self.provider = DBProvider()
+
+    def set_date(self, current_date):
+        self.specified_date = current_date
+
+    def history(self, assets, field='price', window=30, frequency='1d'):
+        pass
+
+    def current(self, symbols):
+        pass
 
 if __name__ == '__main__':
     data = Data()
