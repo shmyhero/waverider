@@ -86,7 +86,7 @@ class YahooEquityDAO(BaseDAO):
         return new_rows
 
     def get_min_time_and_price_from_min(self, symbol, start_time=datetime.datetime(1971, 1, 1, 0, 0, 0), end_time=datetime.datetime(9999, 1, 1, 0, 0, 0)):
-        query = """select tradeTime, closePrice from equity_min where tradeTime >= '{}' and tradeTime <= '{}' and symbol = '{}' order by tradeTime """.format(
+        query = """select tradeTime, closePrice from equity_min where tradeTime >= '{}' and tradeTime <= '{}' and tradeTime not like '%09:30:00' and symbol = '{}' order by tradeTime """.format(
             start_time, end_time, symbol)
         rows = self.select(query)
         return rows
