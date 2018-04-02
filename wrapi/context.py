@@ -8,14 +8,11 @@ class Context(object):
 
     def __init__(self):
         self.strategy_name = None
-        self._portfolio = None
         self.terminate_p = False
 
     @property
     def portfolio(self):
-        if self._portfolio is None:
-            self._portfolio = API().get_portfolio_info()
-        return self._portfolio
+        return API().get_portfolio_info()
 
     def display_all(self):
         # positions = '\r\n'.join(self.portfolio.positions_amounts)
