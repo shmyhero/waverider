@@ -113,13 +113,15 @@ class TradeTime(object):
     def get_from_date_by_window(window):
         current_date = TradeTime.get_latest_trade_date()
         count = 1
-        for i in range(2*window):
+        for i in range(2*window+1):
             if count >= window:
-                return current_date
-            current_date -= datetime.timedelta(days=1)
-            if TradeTime.is_trade_day(current_date):
-                if not TradeTime.is_half_trade_day(current_date):
-                    count +=1
+                break
+            else:
+                current_date -= datetime.timedelta(days=1)
+                if TradeTime.is_trade_day(current_date):
+                    if not TradeTime.is_half_trade_day(current_date):
+                        count +=1
+        return current_date
 
 
 if __name__ == '__main__':
@@ -141,4 +143,5 @@ if __name__ == '__main__':
     print datetime.datetime.now(tz=pytz.timezone('Asia/Shanghai'))
     #n = datetime.datetime.now(tz=pytz.utc)
     #print TradeTime.get_latest_trade_date()
-    #print TradeTime.get_from_date_by_window(252)
+    print TradeTime.get_from_date_by_window(252)
+    print TradeTime.get_from_date_by_window(1)
