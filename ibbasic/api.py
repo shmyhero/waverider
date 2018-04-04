@@ -2,29 +2,32 @@ import datetime
 import pytz
 from utils.timezonehelper import get_delta_hour_to_us_east
 from utils.iohelper import read_file_to_string, write_to_file
-from utils.logger import Logger
+from utils.logger import Logger, DailyLoggerFactory
 from utils.shell import Shell
 from utils.stringhelper import string_fetch
-from utils.mathhelper import average
 from common.pathmgr import PathMgr
 from utils.listhelper import list_to_hash
 from ibbasic.portfolio import Portfolio
 
 
+def get_logger():
+    return DailyLoggerFactory.get_logger(__name__, PathMgr.get_log_path())
+
+
 class API(object):
 
     def __init__(self):
-        self.logger = Logger(__name__, PathMgr.get_log_path())
+        pass
 
     def run_cmd(self, cmd_name, args=[]):
         file_path = PathMgr.get_command_file_path(cmd_name)
         lst = map(str, [file_path] + args)
         cmd = 'python \"{}\"'.format('\" \"'.join(lst))
-        self.logger.info('run command: %s'%cmd)
+        get_logger().info('run command: %s'%cmd)
         output = Shell.run_cmd(cmd, True)
         if 'errorCode=502' in output:
             raise Exception(output)
-        self.logger.info('output: %s'%output, False)
+        get_logger().info('output: %s'%output, False)
         return output
 
     @staticmethod
@@ -70,10 +73,10 @@ class API(object):
         if output == '':
             raise Exception('Failed to get account info, please check the IB gateway, config, network and ibpy2 packages, etc...')
         str_available_funds = string_fetch(output, 'AvailableFunds, value=', ',')
-        # self.logger.info("available_funds string value: %s"%str_available_funds)
+        # get_logger().info("available_funds string value: %s"%str_available_funds)
         available_funds = float(str_available_funds)
         str_net_liquidation = string_fetch(output, 'NetLiquidation, value=', ',')
-        # self.logger.info("net_liquidation string value: %s" % str_net_liquidation)
+        # get_logger().info("net_liquidation string value: %s" % str_net_liquidation)
         net_liquidation = float(str_net_liquidation)
         items = output.split('<updatePortfolio')
         if len(items) > 0:
@@ -151,10 +154,10 @@ class API(object):
         output = self.run_cmd('cancel_order', [order_id])
         msg = 'OrderId %s that needs to be cancelled is not found' % order_id
         if msg in output:
-            self.logger.error(msg)
+            get_logger().error(msg)
             raise Exception(msg)
         else:
-            self.logger.info('OrderId %s cancelled'%order_id)
+            get_logger().info('OrderId %s cancelled'%order_id)
 
 if __name__ == '__main__':
     # print API().get_portfolio_info()

@@ -2,9 +2,14 @@ import traceback
 from abc import ABCMeta, abstractmethod
 from utils.httphelper import HttpHelper
 from utils.stringhelper import string_fetch
-from utils.logger import Logger
+from utils.logger import Logger, DailyLoggerFactory
+from common.pathmgr import PathMgr
 from dataaccess.symbols import Symbols
 from ibbasic.api import API
+
+
+def get_logger():
+    return DailyLoggerFactory.get_logger(__name__, PathMgr.get_log_path())
 
 
 class AbstractCurrentDataProvider(object):
@@ -18,13 +23,13 @@ class AbstractCurrentDataProvider(object):
 
 class YahooScraper(AbstractCurrentDataProvider):
 
-    def __init__(self, logger=Logger(__name__, None)):
-        self.logger = logger
+    def __init__(self):
+        pass
 
     def get_data_by_symbol(self, symbol):
         yahoo_symbol = Symbols.get_mapped_symbol(symbol)
         url = 'https://finance.yahoo.com/quote/%s/' % yahoo_symbol
-        self.logger.info('Http request to: %s' % url, False)
+        get_logger().info('Http request to: %s' % url, False)
         content = HttpHelper.http_get(url)
         content = string_fetch(content, 'Currency in USD', 'At close:')
         content = string_fetch(content, 'react-text', 'react-text')
@@ -35,19 +40,19 @@ class YahooScraper(AbstractCurrentDataProvider):
         try:
             return map(self.get_data_by_symbol, symbols)
         except Exception as e:
-            self.logger.error('Trace: ' + traceback.format_exc(), True)
-            self.logger.error('Error: get current price from Yahoo failed:' + str(e))
+            get_logger().error('Trace: ' + traceback.format_exc(), True)
+            get_logger().error('Error: get current price from Yahoo failed:' + str(e))
             return None
 
 
 class MarketWatchScraper(AbstractCurrentDataProvider):
 
-    def __init__(self, logger=Logger(__name__, None)):
-        self.logger = logger
+    def __init__(self):
+        pass
 
     def get_data_by_symbol(self, symbol):
         url = 'https://www.marketwatch.com/investing/fund/%s' % symbol
-        self.logger.info('Http request to: %s' % url, False)
+        get_logger().info('Http request to: %s' % url, False)
         content = HttpHelper.http_get(url)
         content = string_fetch(content, 'mw-rangeBar precision=', 'Day Low')
         value = string_fetch(content, '\"last-value\">', '</span>')
@@ -57,16 +62,15 @@ class MarketWatchScraper(AbstractCurrentDataProvider):
         try:
             return map(self.get_data_by_symbol, symbols)
         except Exception as e:
-            self.logger.error('Trace: ' + traceback.format_exc(), False)
-            self.logger.error('Error: get current price from MarketWatch failed:' + str(e))
+            get_logger().error('Trace: ' + traceback.format_exc(), False)
+            get_logger().error('Error: get current price from MarketWatch failed:' + str(e))
             return None
 
 
 class IBCurrent(AbstractCurrentDataProvider):
 
-    def __init__(self, logger=Logger(__name__, None)):
+    def __init__(self):
         self.api = API()
-        self.logger = logger
 
     def get_data_by_symbol(self, symbol):
         return self.api.get_market_price(symbol)
@@ -75,8 +79,8 @@ class IBCurrent(AbstractCurrentDataProvider):
         try:
             return map(self.get_data_by_symbol, symbols)
         except Exception as e:
-            self.logger.error('Trace: ' + traceback.format_exc(), False)
-            self.logger.error('Error: get current price from IB failed:' + str(e))
+            get_logger().error('Trace: ' + traceback.format_exc(), False)
+            get_logger().error('Error: get current price from IB failed:' + str(e))
             return None
 
 

@@ -1,11 +1,16 @@
 import datetime
 import pytz
 from abc import ABCMeta, abstractmethod
-from utils.logger import Logger
+from utils.logger import Logger, DailyLoggerFactory
+from common.pathmgr import PathMgr
 from dataaccess.symbols import Symbols
 from dataaccess.db import YahooEquityDAO
 from common.tradetime import TradeTime
 from ibbasic.api import API
+
+
+def get_logger():
+    return DailyLoggerFactory.get_logger(__name__, PathMgr.get_log_path())
 
 
 class AbstractHistoricalDataProvider(object):
@@ -22,8 +27,8 @@ class AbstractHistoricalDataProvider(object):
 
 class DBProvider(AbstractHistoricalDataProvider):
 
-    def __init__(self, logger=Logger(__name__, None)):
-        self.logger = logger
+    def __init__(self):
+        pass
 
     def history(self, symbol, field, window):
         fields_dic = {'open': 'openPrice', 'close': 'adjclosePrice', 'high': 'highPrice', 'low': 'lowPrice',
@@ -50,8 +55,7 @@ class DBProvider(AbstractHistoricalDataProvider):
 
 class IBProvider(AbstractHistoricalDataProvider):
 
-    def __init__(self, logger=Logger(__name__, None)):
-        self.logger = logger
+    def __init__(self):
         self.api = API()
 
     def history(self, symbol, field, window):
