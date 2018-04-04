@@ -113,7 +113,7 @@ class TradeTime(object):
     def get_from_date_by_window(window):
         current_date = TradeTime.get_latest_trade_date()
         count = 1
-        for i in range(2*window+1):
+        for i in range(2*window+7):
             if count >= window:
                 break
             else:
