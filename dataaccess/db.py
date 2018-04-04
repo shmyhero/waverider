@@ -1,15 +1,19 @@
 import traceback
 import datetime
 import mysql.connector
-from utils.logger import Logger
+from utils.logger import DailyLoggerFactory
 from common.pathmgr import PathMgr
 from common.configmgr import ConfigMgr
+
+
+def get_logger():
+    return DailyLoggerFactory.get_logger(__name__, PathMgr.get_log_path())
 
 
 class BaseDAO(object):
 
     def __init__(self):
-        self.logger = Logger(__name__, PathMgr.get_log_path())
+        pass
 
     @staticmethod
     def get_connection():
@@ -17,7 +21,7 @@ class BaseDAO(object):
         return mysql.connector.connect(host=db_config['host'], user=db_config['user'], password=db_config['password'], database=db_config['database'])
 
     def select(self, query, cursor=None):
-        # self.logger.info('query:%s' % query)
+        # get_logger().info('query:%s' % query)
         conn = None
         if cursor is None:
             conn = BaseDAO.get_connection()
@@ -28,7 +32,7 @@ class BaseDAO(object):
             return rows
         except Exception as e:
             error_message = "Query:{}, error message: {}, Stack Trace: {}".format(query, str(e), traceback.format_exc())
-            self.logger.exception(error_message)
+            get_logger().exception(error_message)
         finally:
             if conn:
                 conn.close()
@@ -53,6 +57,12 @@ class YahooEquityDAO(BaseDAO):
             return None
         else:
             return rows[0][0]
+
+    def get_equity_prices_by_start_end_date(self, symbol, start_date, end_date):
+        query_template = """select tradeDate, adjClosePrice from yahoo_equity where symbol = '{}' and tradeDate >= '{}' and tradeDate<= '{}' order by tradeDate """
+        query = query_template.format(symbol, start_date, end_date)
+        rows = self.select(query)
+        return rows
 
     def get_all_equity_price_by_symbol(self, symbol, from_date_str='1993-01-01', price_field = 'adjClosePrice'):
         query_template = """select tradeDate, {} from yahoo_equity where symbol = '{}' and tradeDate >= str_to_date('{}', '%Y-%m-%d') order by tradeDate"""
@@ -98,3 +108,6 @@ class YahooEquityDAO(BaseDAO):
             return self.get_min_time_and_price_from_min(symbol, start_time, end_time)
 
 
+if __name__ == '__main__':
+    # print YahooEquityDAO().get_equity_prices_by_start_end_date('SPY', datetime.datetime(2018, 1, 1, 0, 0, 0), datetime.datetime(2018, 3, 1, 0, 0, 0))
+    print YahooEquityDAO().get_min_time_and_price('SPY', datetime.datetime(2018, 4, 1, 0, 0, 0), datetime.datetime(2018, 4, 3, 0, 0, 0))
