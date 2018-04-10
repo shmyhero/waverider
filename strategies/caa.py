@@ -28,14 +28,14 @@ def initialize(context):
                       time_rules.market_close(minutes=15))
 
 
-def handle_data(context, data):
-    try:
-        log.info(context.display_all())
-        caa_rebalance(context, data)
-        context.end()
-    except Exception as e:
-        log.error('Error in handle_data: ' + str(e))
-        traceback.print_exc()
+# def handle_data(context, data):
+#     try:
+#         log.info(context.display_all())
+#         caa_rebalance(context, data)
+#         context.end()
+#     except Exception as e:
+#         log.error('Error in handle_data: ' + str(e))
+#         traceback.print_exc()
 
 def caa_rebalance(context, data):
     prices = data.history(context.caa_stocks, 'price', 260, '1d').dropna()

@@ -1,8 +1,15 @@
-from abc import abstractmethod, ABCMeta
+import math
+import datetime
+from abc import abstractmethod
 from common.tradetime import TradeTime
 
 
 class TimeRule(object):
+
+    @abstractmethod
+    def get_datetime(self, date):
+        """consumed in back test"""
+        pass
 
     @abstractmethod
     def validate(self, dt):
@@ -20,6 +27,10 @@ class MarketOpenRule(TimeRule):
         TimeRule.check_parameters(hours, minutes)
         self.hours = hours
         self.minutes = minutes
+
+    def get_datetime(self, date):
+        passed_minutes = self.hours * 60 + self.minutes + 9*60 + 30
+        return datetime.datetime(date.year, date.month, date.day, int(math.floor(passed_minutes/60)), passed_minutes % 60, 0)
 
     def validate(self, dt):
         if TradeTime.is_trade_day(dt.date()):
@@ -40,6 +51,13 @@ class MarketCloseRule(TimeRule):
         TimeRule.check_parameters(hours, minutes)
         self.hours = hours
         self.minutes = minutes
+
+    def get_datetime(self, date):
+        if TradeTime.is_half_trade_day(date):
+            passed_minutes = 13*60 - self.hours * 60 - self.minutes
+        else:
+            passed_minutes = 16*60 - self.hours * 60 - self.minutes
+        return datetime.datetime(date.year, date.month, date.day, int(math.floor(passed_minutes/60)), passed_minutes % 60, 0)
 
     def validate(self, dt):
         if TradeTime.is_trade_day(dt.date()):

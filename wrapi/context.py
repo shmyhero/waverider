@@ -20,7 +20,7 @@ class Context(object):
         for k, v in self.portfolio.positions_amounts:
             if len(k) > 15:
                 underlying = k[0:-15]
-                exp_date = datetime.datetime.strptime(k[-15:-9],'%y%m%d')
+                exp_date = datetime.datetime.strptime(k[-15:-9], '%y%m%d')
                 if k[-9] == 'C':
                     call_or_put = 'Call'
                 else:

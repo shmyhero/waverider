@@ -45,17 +45,17 @@ class MontCarlo(object):
             result.append(prices)
         return result
 
-    def brownian_motion2(self, window, times):
+    def brownian_motion2(self, window, times, count):
         last_price = self.prices[-1]
 
         # calculate the compound annual growth rate(CAGR) which
         # will give us mean return input(mu)
         days = len(self.prices)
-        cagr = ((last_price / self.prices[0]) ** (365.0 / days)) - 1
+        cagr = ((last_price / self.prices[0]) ** (count / days)) - 1
         mu = cagr
 
         returns = self.prices.pct_change()
-        vol = returns.std() * math.sqrt(252)
+        vol = returns.std() * math.sqrt(count)
         results = []
         for i in range(times):
             daily_returns = np.random.normal((1 + mu) ** (1 / window), vol / math.sqrt(window), window)
@@ -69,12 +69,13 @@ class MontCarlo(object):
 def simulate_min(symbol, start, end, window, times):
     rows = YahooEquityDAO().get_min_time_and_price(symbol, start, end)
     prices = pd.Series(map(lambda x: x[1], rows), index=map(lambda x: x[0], rows))
-    return MontCarlo(prices).brownian_motion2(window, times)
+    return MontCarlo(prices).brownian_motion2(window, times, 390)
+
 
 def simulate_daily(symbol, start, end, window, times):
     rows = YahooEquityDAO().get_equity_prices_by_start_end_date(symbol, start, end)
     prices = pd.Series(map(lambda x: x[1], rows), index=map(lambda x: x[0], rows))
-    return MontCarlo(prices).brownian_motion2(window, times)
+    return MontCarlo(prices).brownian_motion2(window, times, 252)
 
 
 def line_graph(results):
@@ -84,6 +85,6 @@ def line_graph(results):
 
 
 if __name__ == '__main__':
-    results = simulate_min('SVXY', datetime.datetime(2018, 2, 7, 0, 0, 0), datetime.datetime(2018, 4, 1, 0, 0, 0), 500, 5)
-    # results = simulate_min('SPY', datetime.datetime(2001, 2, 7, 0, 0, 0), datetime.datetime(2018, 4, 1, 0, 0, 0), 500, 5)
+    # results = simulate_min('SVXY', datetime.datetime(2018, 2, 7, 0, 0, 0), datetime.datetime(2018, 4, 1, 0, 0, 0), 500, 5)
+    results = simulate_daily('SPY', datetime.datetime(2001, 2, 7, 0, 0, 0), datetime.datetime(2018, 4, 1, 0, 0, 0), 500, 5)
     line_graph(results)

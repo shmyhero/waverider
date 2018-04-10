@@ -8,6 +8,7 @@ from wrapi.data import Data
 from wrapi.analysis import PortfolioDAO
 from wrapi.date_rules import EveryDayRule
 from wrapi.time_rules import MarketCloseRule
+from wrapi.backtestlogger import DailyBackTestLoggerFactory
 
 
 class ScheduleFunction(object):
@@ -69,6 +70,10 @@ class Container(object):
         return Container._schedule_function_dic[strategy_name] + global_schedule_functions
 
     @staticmethod
+    def get_back_test_schedule_functions(strategy_name):
+        return Container._schedule_function_dic[strategy_name]
+
+    @staticmethod
     def get_handle_function(strategy_name):
         if strategy_name in Container._handle_data_dic.keys():
             return Container._handle_data_dic[strategy_name]
@@ -77,7 +82,10 @@ class Container(object):
 
     @staticmethod
     def get_logger(strategy_name):
-        return DailyLoggerFactory.get_logger(strategy_name, PathMgr.get_log_path(strategy_name))
+        if type(Container.data).__name__ == 'Data':
+            return DailyLoggerFactory.get_logger(strategy_name, PathMgr.get_log_path(strategy_name))
+        else:
+            return DailyBackTestLoggerFactory.get_logger(PathMgr.get_log_path('BackTest/%s'%strategy_name))
 
     @staticmethod
     def schedule_function(func, date_rule, time_rule):

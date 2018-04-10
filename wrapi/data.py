@@ -1,9 +1,10 @@
+import datetime
 import traceback
 import pandas as pd
 from utils.logger import DailyLoggerFactory
 from common.pathmgr import PathMgr
 from common.tradetime import TradeTime
-from dataaccess.history import DBProvider, IBProvider
+from dataaccess.history import DBProvider, IBProvider, BackTestDBProvider
 from dataaccess.current import YahooScraper, MarketWatchScraper, IBCurrent
 
 
@@ -92,36 +93,64 @@ class Data(object):
 class BackTestData(object):
 
     def __init__(self):
-        self.logger = DailyLoggerFactory.get_logger(__name__, PathMgr.get_log_path('BackTest'))
-        self.specified_date = TradeTime.get_latest_trade_date()
-        self.provider = DBProvider()
+        self.provider = BackTestDBProvider()
+        dt = TradeTime.get_latest_trade_date()
+        self.specified_date_time = datetime.datetime(dt.year, dt.month, dt.day, 16, 0, 0)
 
-    def set_date(self, current_date):
-        self.specified_date = current_date
+    def set_datetime(self, current_date_time):
+        self.specified_date_time = current_date_time
 
     def history(self, assets, field='price', window=30, frequency='1d'):
-        pass
+        if hasattr(assets, '__iter__'):
+            results = None
+            columns = ['date']
+            for symbol in assets:
+                columns.append(symbol)
+                if frequency == '1d':
+                    rows = self.provider.history(symbol, field, window, self.specified_date_time.date())
+                elif frequency == '1m':
+                    columns[0] = 'minute'
+                    rows = self.provider.history_min(symbol, window, self.specified_date_time)
+                if results is None:
+                    results = map(list, rows)
+                else:
+                    map(lambda x, y: x.append(y[1]), results, rows)
+            if len(results) > window:
+                results = results[:window]
+            df = pd.DataFrame(map(lambda x: x[1:], results), index=map(lambda x: x[0], results), columns=columns[1:])
+            return df
+        else:
+            symbol = str(assets)
+            if frequency == '1d':
+                rows = self.provider.history(symbol, field, window, self.specified_date_time.date())
+            elif frequency == '1m':
+                rows = self.provider.history_min(symbol, window, self.specified_date_time)
+            if len(rows) > window:
+                rows = rows[:window]
+            series = pd.Series(map(lambda x: x[1], rows), index=map(lambda x: x[0], rows))
+            return series
 
     def current(self, symbols):
-        pass
-
+        values = self.history(symbols, window=1, frequency='1m')
+        if type(symbols) is str:
+            return values[0]
+        else:
+            return values.iloc[0]
 if __name__ == '__main__':
-    data = Data()
+    # data = Data()
     # result = data.history(['SPY', 'QQQ'], field='close', window=1)
     # print result
     # print type(result)
     # result = data.history('QQQ', field='close', window=100)
     # print result
     # print result[0]
-    from pandas import Timestamp
+    # from pandas import Timestamp
 
-    xiv_prices = data.history('SVXY', "price", 1440, "1m").resample('30T',
-                                                                         closed='right',
-                                                                         label='right').last().dropna()
-    xiv_prices.index = [Timestamp(x, tz='US/Eastern') for x in xiv_prices.index]
-    xiv_prices.index = [Timestamp(x, tz='UTC') for x in xiv_prices.index]
+    # xiv_prices = data.history('SVXY', "price", 1440, "1m").resample('30T', closed='right',  label='right').last().dropna()
+    # xiv_prices.index = [Timestamp(x, tz='US/Eastern') for x in xiv_prices.index]
+    # xiv_prices.index = [Timestamp(x, tz='UTC') for x in xiv_prices.index]
 
-    print xiv_prices
+    # print xiv_prices
     # print data.history('SPX')
     #print data.history(['SPY', 'VIX'], window=252)
     # print data.current(['SPY', 'QQQ', 'VIX', 'NDX'])
@@ -131,3 +160,18 @@ if __name__ == '__main__':
     #print data.current(['DJI', 'SPY'])
     #print data.current('SPY', ['open', 'close', 'high', 'low'])
     # print data.history(['xiv', 'vxx'], window=1700)
+    data = BackTestData()
+    data.set_datetime(datetime.datetime(2018, 3, 5, 9, 30, 0))
+    # print data.history('SPY', window=5)
+
+    # NOT include current datetime.
+    print data.history(['SPY', 'QQQ'], window=5)
+    # print data.history('SVXY', window=60, frequency='1m')
+    print data.history(['SVXY', 'VIX'], window=60, frequency='1m')
+    # print data.history(['SVXY', 'VIX'], window=1, frequency='1m')
+    # print data.current('SVXY')
+    print data.current(['SVXY', 'VIX'])
+    # print Data().current(['SVXY', 'VIX'])
+    # print data.history(['SVXY', 'VIX'], window=1, frequency='1m').iloc[0][0]
+    # print Data().current(['SVXY', 'VIX'])[0]
+

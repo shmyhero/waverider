@@ -159,6 +159,19 @@ class API(object):
         else:
             get_logger().info('OrderId %s cancelled'%order_id)
 
+
+class MockAPI(object):
+
+    def __init__(self, init_funds):
+        self.portfolio = Portfolio(init_funds, init_funds, {})
+
+    def get_portfolio_info(self):
+        return self.portfolio
+
+    
+
+
+
 if __name__ == '__main__':
     # print API().get_portfolio_info()
     # print API.get_order_id()
