@@ -18,6 +18,9 @@ class Logger:
         else:
             self.log_path = None
 
+    def get_formatter(self):
+        return logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
     def init_handler(self, name):
         file_path = '%s/%s.log'%(self.log_path, datetime.date.today())
         if Logger.log_file != file_path:
@@ -25,7 +28,8 @@ class Logger:
             Logger.logger_names = []
         if name not in Logger.logger_names:
             fh = logging.FileHandler(file_path)
-            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            formatter = self.get_formatter()
             fh.setFormatter(formatter)
             self.logger.addHandler(fh)
             Logger.log_file = file_path

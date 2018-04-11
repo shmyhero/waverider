@@ -46,8 +46,36 @@ class DBProvider(AbstractHistoricalDataProvider):
         # yahoo_symbol = Symbols.get_mapped_symbol(symbol, Symbols.YahooSymbolMapping)
         us_dt = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
         end_time = datetime.datetime(us_dt.year, us_dt.month, us_dt.day, us_dt.hour, us_dt.minute, us_dt.second)
-        days_window = window/391 + 1
+        days_window = window/391 + 2
         from_date = TradeTime.get_from_date_by_window(days_window)
+        start_time = datetime.datetime(from_date.year, from_date.month, from_date.day, 0, 0)
+        rows = YahooEquityDAO().get_min_time_and_price(symbol, start_time, end_time)
+        return rows[-window:]
+
+
+class BackTestDBProvider(AbstractHistoricalDataProvider):
+
+    def __init__(self):
+        pass
+
+    def history(self, symbol, field, window, current_date):
+        fields_dic = {'open': 'openPrice', 'close': 'adjclosePrice', 'high': 'highPrice', 'low': 'lowPrice',
+                      'price': 'adjclosePrice', 'unadj':'closePrice'}
+        fields = fields_dic.keys()
+        if field.lower() not in field:
+            raise Exception('the field should be in %s...'%fields)
+        price_field = fields_dic[field]
+        yahoo_symbol = Symbols.get_mapped_symbol(symbol, Symbols.YahooSymbolMapping)
+        from_date = TradeTime.get_from_date_by_window(window+1, current_date)  # window + 1: get one day more data.
+        rows = YahooEquityDAO().get_equity_prices_by_start_end_date(yahoo_symbol, from_date, current_date, price_field)
+        return rows[1:]  # remove current date data.
+
+    def history_min(self, symbol, window, current_date_time):
+        # us_dt = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
+        # end_time = datetime.datetime(us_dt.year, us_dt.month, us_dt.day, us_dt.hour, us_dt.minute, us_dt.second)
+        end_time = current_date_time
+        days_window = window/391 + 2
+        from_date = TradeTime.get_from_date_by_window(days_window, current_date_time.date())
         start_time = datetime.datetime(from_date.year, from_date.month, from_date.day, 0, 0)
         rows = YahooEquityDAO().get_min_time_and_price(symbol, start_time, end_time)
         return rows[-window:]

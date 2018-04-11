@@ -31,3 +31,5 @@ class ConfigMgr(dict):
     @staticmethod
     def get_db_config():
         return ConfigMgr.get_config()['db']
+
+    for_back_test = False

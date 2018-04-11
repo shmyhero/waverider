@@ -110,8 +110,9 @@ class TradeTime(object):
                 return trade_date.date()
 
     @staticmethod
-    def get_from_date_by_window(window):
-        current_date = TradeTime.get_latest_trade_date()
+    def get_from_date_by_window(window, current_date=None):
+        if current_date is None:
+            current_date = TradeTime.get_latest_trade_date()
         count = 1
         for i in range(2*window+7):
             if count >= window:

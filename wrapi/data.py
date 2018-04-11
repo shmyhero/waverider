@@ -2,7 +2,6 @@ import traceback
 import pandas as pd
 from utils.logger import DailyLoggerFactory
 from common.pathmgr import PathMgr
-from common.tradetime import TradeTime
 from dataaccess.history import DBProvider, IBProvider
 from dataaccess.current import YahooScraper, MarketWatchScraper, IBCurrent
 
@@ -89,21 +88,7 @@ class Data(object):
             return None
 
 
-class BackTestData(object):
 
-    def __init__(self):
-        self.logger = DailyLoggerFactory.get_logger(__name__, PathMgr.get_log_path('BackTest'))
-        self.specified_date = TradeTime.get_latest_trade_date()
-        self.provider = DBProvider()
-
-    def set_date(self, current_date):
-        self.specified_date = current_date
-
-    def history(self, assets, field='price', window=30, frequency='1d'):
-        pass
-
-    def current(self, symbols):
-        pass
 
 if __name__ == '__main__':
     data = Data()
