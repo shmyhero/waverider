@@ -38,17 +38,14 @@ class Order(object):
             self.order_target(asset, 0, style, sec_type, trade_trace_fn)
         else:
             portfolio = self.api.get_portfolio_info()
-            current_percent = portfolio.get_percentage(asset)
-            order_cash = (percent - current_percent) * self.api.get_market_value()
-            if order_cash < portfolio.available_funds:
-                try:
-                    market_price = self.api.data.current(asset)
-                except Exception:
-                    market_price = self.api.data.history(asset, window=1)[0]
-                amount = int(round(order_cash/market_price))
-                return self.order(asset, amount, style, sec_type, trade_trace_fn)
-            else:
-                raise Exception('The cost of asset exceed total cash...')
+            current_percent = portfolio.get_percentage(asset, self.api.data)
+            order_cash = (percent - current_percent) * portfolio.get_portfolio_value(self.api.data)
+            # if order_cash < portfolio.available_funds:
+            market_price = self.api.data.get_market_price(asset)
+            amount = int(round(order_cash/market_price))
+            return self.order(asset, amount, style, sec_type, trade_trace_fn)
+            # else:
+            #     raise Exception('The cost of asset exceed total cash...')
 
     def get_open_orders(self, asset=None, include_option=False):
         rows = []

@@ -1,9 +1,12 @@
-from wrapi.quantopian import schedule_function, date_rules, time_rules, symbols,symbol, log, order_target_percent,get_open_orders
+from common.configmgr import ConfigMgr
+if ConfigMgr.for_back_test:
+    from backtest.quantopian import schedule_function, date_rules, time_rules, symbols, symbol, log, order_target_percent,get_open_orders, is_market_open
+else:
+    from wrapi.quantopian import schedule_function, date_rules, time_rules, symbols, symbol, log, order_target_percent,get_open_orders, is_market_open
 import numpy as np
 import pandas as pd
 import traceback
 import time
-from common.tradetime import TradeTime
 
 '''
 20180328 low vol feature
@@ -28,16 +31,17 @@ def initialize(context):
                       time_rules.market_close(minutes=15))
 
 
-def handle_data(context, data):
-    try:
-        log.info(context.display_all())
-        caa_rebalance(context, data)
-        context.end()
-    except Exception as e:
-        log.error('Error in handle_data: ' + str(e))
-        traceback.print_exc()
+# def handle_data(context, data):
+#     try:
+#         log.info(context.display_all())
+#         caa_rebalance(context, data)
+#         context.end()
+#     except Exception as e:
+#         log.error('Error in handle_data: ' + str(e))
+#         traceback.print_exc()
 
 def caa_rebalance(context, data):
+    log.info(context.display_all())
     prices = data.history(context.caa_stocks, 'price', 260, '1d').dropna()
     N = len(context.caa_stocks)
     R = np.log(prices).diff().dropna()
@@ -68,7 +72,7 @@ def caa_rebalance(context, data):
 
 # Replacement of order_target_percent
 def order_target_ratio(context, data, stock, ratio):
-    if not TradeTime.is_market_open():
+    if not is_market_open():
         log.warning( 'Market is not opened, order canceled : ' + stock + ' : ' + str(ratio))
         return
     if len(get_open_orders(stock)) != 0:

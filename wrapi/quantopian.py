@@ -1,5 +1,6 @@
 import os
 from utils.stringhelper import string_fetch
+from common.tradetime import TradeTime
 from wrapi.container import Container
 from date_rules import EveryDayRule, WeekStartRule, WeekEndRule, MonthStartRule, MonthEndRule
 from time_rules import MarketOpenRule, MarketCloseRule
@@ -111,6 +112,10 @@ class time_rules(object):
         :return:
         """
         return MarketCloseRule(hours, minutes)
+
+
+def is_market_open():
+    return TradeTime.is_market_open()
 
 
 def order_target(asset, amount, style=OrderStyle.MarketOrder, sec_type='STK'):

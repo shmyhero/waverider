@@ -108,4 +108,4 @@ class StrategyRunner(object):
 
 if __name__ == '__main__':
     # print BackTest.generate_datetimes(datetime.date(2018, 3, 1), datetime.date(2018, 3, 5))
-    StrategyRunner.run('caa', datetime.date(2010, 1, 1), datetime.date(2018, 4, 5))
+    StrategyRunner.run('caa', datetime.date(2017, 1, 1), datetime.date(2018, 4, 11))

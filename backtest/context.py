@@ -31,9 +31,8 @@ class Context(object):
                 symbol = k
             positions = positions + symbol + ':\t'+ str(v) + '\n\r'
 
-        content = ['portfolio value:%s' % self.portfolio.portfolio_value,
-                   'position value: %s' % self.portfolio.positions_value,
-                   'capital used: %s' % self.portfolio.capital_used,
+        content = ['portfolio value:%s' % self.portfolio.get_portfolio_value(self.api.data),
+                   'available funds: %s' % self.portfolio.available_funds,
                    'positions amounts: %s' % positions]
         return '\r\n'.join(content)
 

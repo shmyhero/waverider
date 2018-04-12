@@ -10,11 +10,8 @@ class API(object):
     def get_portfolio_info(self):
         return self.portfolio
 
-    def get_market_value(self):
-        total = self.portfolio.available_funds
-        for [symbol, amount] in self.portfolio.positions_amounts:
-            total += self.data.current(symbol) * amount
-        return total
+    # def get_position_value(self):
+    #     return self.portfolio.get_portfolio_value(data)
 
     def order(self, symbol, quantity):
         if quantity != 0:
@@ -23,7 +20,7 @@ class API(object):
             except:
                 price = self.data.history(symbol, window=1)[0]
             exist_amount = self.portfolio.positions[symbol].amount
-            self.portfolio.positions[symbol] = Position(symbol, exist_amount + quantity, 0, 0)
+            self.portfolio.positions[symbol] = Position(symbol, exist_amount + quantity)
             self.portfolio.available_funds -= quantity * price
 
 

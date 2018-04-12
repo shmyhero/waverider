@@ -113,6 +113,10 @@ class time_rules(object):
         return MarketCloseRule(hours, minutes)
 
 
+def is_market_open():
+    return True
+
+
 def order_target(asset, amount, style=OrderStyle.MarketOrder, sec_type='STK'):
     """
     Places an order to a target number of shares.

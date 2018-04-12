@@ -20,7 +20,7 @@ class Positions(MutableMapping):
         if key in self._storage.keys():
             return self._storage[key]
         else:
-            return Position(key, 0, 0, 0)
+            return Position(key, 0)
 
     def __setitem__(self, key, value):
         self._storage[key] = value
@@ -41,27 +41,34 @@ class Portfolio(object):
         self.available_funds = init_funds
         self.positions = Positions()
 
-    @property
-    def portfolio_value(self):
-        # return self.net_liquidation
-        # TODO
-        pass
-
-    @property
-    def positions_value(self):
-        # return sum(map(lambda x: x.value, self.positions.values()))
-        # TODO:
-        pass
+    def get_quantity(self, symbol):
+        return self.positions[symbol].amount
 
     @property
     def positions_amounts(self):
-        return map(lambda x: [x.symbol, x.amount], self.positions.values())
+        return filter(lambda x: x[1] != 0, map(lambda x: [x.symbol, x.amount], self.positions.values()))
+
+    def get_positions_value(self, data):
+        total = 0
+        for [symbol, amount] in self.positions_amounts:
+            total += data.get_market_price(symbol) * amount
+        return total
+
+    def get_portfolio_value(self, data):
+        return self.get_positions_value(data) + self.available_funds
+
+    def get_percentage(self, symbol, data):
+        if symbol in self.positions.keys():
+            quantity = self.get_quantity(symbol)
+            return quantity * data.get_market_price(symbol) / self.get_portfolio_value(data)
+        else:
+            return 0
 
     @property
     def capital_used(self):
         # return sum(map(lambda x: x.cost, self.positions.values()))
         pass
-        
+
     def to_dict(self):
         dic = {}
         for key in self.__dict__.keys():

@@ -51,6 +51,14 @@ class Data(object):
         else:
             return values.iloc[0]
 
+    def get_market_price(self, symbol):
+        try:
+            market_price = self.current(symbol)
+        except Exception:
+            market_price = self.history(symbol, window=1)[0]
+        return market_price
+
+
 if __name__ == '__main__':
     data = Data()
     data.set_datetime(datetime.datetime(2018, 3, 5, 9, 30, 0))
