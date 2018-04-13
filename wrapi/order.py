@@ -51,16 +51,23 @@ class Order(object):
             portfolio = API().get_portfolio_info()
             current_percent = portfolio.get_percentage(asset)
             order_cash = (percent - current_percent) * portfolio.net_liquidation
-            if order_cash < portfolio.available_funds:
-                try:
-                    market_price = API().get_market_price(asset)
-                except Exception:
-                    from wrapi.data import Data
-                    market_price = Data().current(asset)
-                amount = int(round(order_cash/market_price))
-                return Order.order(asset, amount, style, sec_type, trade_trace_fn)
-            else:
-                raise Exception('The cost of asset exceed total cash...')
+            # if order_cash < portfolio.available_funds:
+            try:
+                market_price = API().get_market_price(asset)
+            except Exception:
+                from wrapi.data import Data
+                market_price = Data().current(asset)
+            amount = int(round(order_cash/market_price))
+            return Order.order(asset, amount, style, sec_type, trade_trace_fn)
+            # else:
+            #     message_tempalte = """The cost of asset exceed total cash;
+            #                           percent=%s,
+            #                           current_percent=%s,
+            #                           net_liquidation=%s,
+            #                           order_cash=%s,
+            #                           available_funds=%s"""
+            #     message = message_tempalte % (percent, current_percent, portfolio.net_liquidation, order_cash, portfolio.available_funds)
+            #     raise Exception(message)
 
     @staticmethod
     def get_open_orders(asset=None, include_option=False):
