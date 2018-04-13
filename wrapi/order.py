@@ -1,4 +1,6 @@
 import pandas as pd
+from utils.logger import DailyLoggerFactory
+from common.pathmgr import PathMgr
 from ibbasic.api import API
 
 
@@ -22,6 +24,10 @@ class Order(object):
 
     def __init__(self):
         pass
+
+    @staticmethod
+    def get_logger():
+        return DailyLoggerFactory.get_logger(__name__, PathMgr.get_log_path())
 
     @staticmethod
     def order(asset, amount, style=OrderStyle.MarketOrder, sec_type='STK', trade_trace_fn=None):
@@ -51,6 +57,13 @@ class Order(object):
             portfolio = API().get_portfolio_info()
             current_percent = portfolio.get_percentage(asset)
             order_cash = (percent - current_percent) * portfolio.net_liquidation
+            message_tempalte = """percent=%s, 
+                                  current_percent=%s, 
+                                  net_liquidation=%s, 
+                                  order_cash=%s, 
+                                  available_funds=%s"""
+            message = message_tempalte % (percent, current_percent, portfolio.net_liquidation, order_cash, portfolio.available_funds)
+            Order.get_logger().info(message)
             # if order_cash < portfolio.available_funds:
             try:
                 market_price = API().get_market_price(asset)
@@ -59,15 +72,7 @@ class Order(object):
                 market_price = Data().current(asset)
             amount = int(round(order_cash/market_price))
             return Order.order(asset, amount, style, sec_type, trade_trace_fn)
-            # else:
-            #     message_tempalte = """The cost of asset exceed total cash;
-            #                           percent=%s,
-            #                           current_percent=%s,
-            #                           net_liquidation=%s,
-            #                           order_cash=%s,
-            #                           available_funds=%s"""
-            #     message = message_tempalte % (percent, current_percent, portfolio.net_liquidation, order_cash, portfolio.available_funds)
-            #     raise Exception(message)
+
 
     @staticmethod
     def get_open_orders(asset=None, include_option=False):
