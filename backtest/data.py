@@ -58,6 +58,9 @@ class Data(object):
             market_price = self.history(symbol, window=1)[0]
         return market_price
 
+    def get_daily_price(self, symbol):
+        return self.history(symbol, window=1)[0]
+
 
 if __name__ == '__main__':
     data = Data()

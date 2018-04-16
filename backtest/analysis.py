@@ -1,113 +1,58 @@
 import datetime
-import pytz
-import os
-import json
 import math
 import numpy as np
-from utils.iohelper import read_file_to_string, append_to_file, write_to_file, ensure_parent_dir_exists
-from common.pathmgr import PathMgr
-from backtest.order import OrderStyle
-from backtest.data import Data
-
-
-class TradeRecord(object):
-
-    @staticmethod
-    def read_from_line(line):
-        record = line.split(',')
-        time = datetime.datetime.strptime(record[0], '%Y-%m-%d %H:%M:%S')
-        symbol = record[1]
-        amount = int(record[2])
-        price = float(record[3])
-        return TradeRecord(time, symbol, amount, price)
-
-    def __init__(self, time, symbol, amount, price):
-        self.time = time
-        self.symbol = symbol
-        self.amount = amount
-        self.price = price
-
-    def __str__(self):
-        return str(self.__dict__)
-
-
-class TradeRecordDAO(object):
-
-    @staticmethod
-    def write_trade_trace(strategy_name, asset, amount, dt):
-        print [dt, strategy_name, asset, amount]
-        # file_path = PathMgr.get_strategies_tradetrace_file(strategy_name)
-        # time = datetime.datetime.now(tz=pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S')
-        # if style == OrderStyle.MarketOrder:
-        #     price = Data().current(asset)
-        # else:
-        #     price = style[1]
-        # content = ','.join(map(str, [time, asset, amount, price]))
-        # append_to_file(file_path, '%s\r\n' % content)
-
-    @staticmethod
-    def read_trade_trace(strategy_name):
-        file_path = PathMgr.get_strategies_tradetrace_file(strategy_name)
-        content = read_file_to_string(file_path)
-        lines = content.split('\r\n')[:-1]
-        return map(TradeRecord.read_from_line, lines)
-
-
-class PortfolioDAO(object):
-
-    @staticmethod
-    def save_portfolio_info(strategy_name):
-        date = datetime.datetime.now(tz=pytz.timezone('US/Eastern')).strftime('%Y-%m-%d')
-        dic = PortfolioDAO.read_portfolio_info(strategy_name)
-        dic[date] = API().get_portfolio_info().to_dict()
-        file_path = PathMgr.get_strategies_portfolio_file(strategy_name)
-        ensure_parent_dir_exists(file_path)
-        write_to_file(file_path, json.dumps(dic, indent=4, sort_keys=True))
-
-    @staticmethod
-    def read_portfolio_info(strategy_name):
-        file_path = PathMgr.get_strategies_portfolio_file(strategy_name)
-        if os.path.exists(file_path):
-            content = read_file_to_string(file_path)
-            dic = json.loads(content)
-            # for key in dic.keys():
-                # dic[key] = Portfolio.from_dict(dic[key])
-            return dic
-        else:
-            return {}
-
+import pandas as pd
+import matplotlib.pyplot as plt
+import ffn
 
 class Analysis(object):
 
-    def __init__(self, strategy_name):
+    def __init__(self, strategy_name, data):
         self.strategy_name = strategy_name
-        self.trade_trace = TradeRecordDAO.read_trade_trace(strategy_name)
-        self.portfolio_info = PortfolioDAO.read_portfolio_info(strategy_name)
-        self.net_liquidations = self.get_netliquidations()
-        self.returns = self.get_returns()
-        spy_values = Data().history('SPY', window=len(self.net_liquidations)).values
-        self.bench_mark_returns = self.get_returns(spy_values)
+        self.data = data
+        self.trade_trace = []
+        self.portfolio_trace = []
+
+    def add_trade_trace(self,  asset, amount, dt):
+        # print [dt, asset, amount]
+        self.trade_trace.append([dt, asset, amount])
+
+    def add_portfolio_trace(self, dt, portfolio):
+        self.portfolio_trace.append([dt, portfolio, portfolio.get_portfolio_value(self.data, False)])
 
     def get_netliquidations(self):
-        records = []
-        for k, v in self.portfolio_info.iteritems():
-            date = datetime.datetime.strptime(k, '%Y-%m-%d')
-            value = v['net_liquidation']
-            records.append([date, value])
-        records.sort(key=lambda x: x[0])
-        return records
+        return map(lambda x: [x[0], x[2]], self.portfolio_trace)
 
     def get_returns(self, values=None):
         if values is None:
-            values = map(lambda x: x[1], self.net_liquidations)
+            values = map(lambda x: x[1], self.get_netliquidations())
         base = values[0]
         return map(lambda x: x/base, values)
 
+    def plot(self):
+        dates = map(lambda x: x[0], self.portfolio_trace)
+        returns = self.get_returns()
+        spy_values = self.data.history('SPY', window=len(returns)).values
+        bench_mark_returns = self.get_returns(spy_values)
+        fig, ax = plt.subplots()
+        ax.plot(dates, returns, label=self.strategy_name)
+        ax.plot(dates, bench_mark_returns, label='SPY')
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=8, borderaxespad=0.)
+        plt.show()
+
+    def calc_stats(self):
+        netliquidations = self.get_netliquidations()
+        df = pd.DataFrame(map(lambda x: x[1:], netliquidations), index=map(lambda x: np.datetime64(x[0]), netliquidations), columns=[self.strategy_name])
+        df.index.name='Date'
+        print df
+        perf = df.calc_stats()
+        print perf[self.strategy_name].stats
+
     def get_start_date(self):
-        return self.net_liquidations[0][0]
+        return self.portfolio_trace[0][0]
 
     def get_end_date(self):
-        return self.net_liquidations[-1][0]
+        return self.portfolio_trace[-1][0]
 
     def get_total_month(self):
         return self.get_end_date().month - self.get_start_date().month
@@ -159,8 +104,7 @@ class Analysis(object):
 
 
 if __name__ == '__main__':
-    print PortfolioDAO.read_portfolio_info('a')
-    PortfolioDAO.save_portfolio_info('a')
+    pass
     # analysis = Analysis('a')
     # print analysis.get_cumulative_return()
     # print analysis.get_annual_return()

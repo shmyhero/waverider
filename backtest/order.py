@@ -1,5 +1,4 @@
 import pandas as pd
-from backtest.container import Container
 
 
 class OrderStyle(object):

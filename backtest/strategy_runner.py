@@ -4,6 +4,7 @@ import traceback
 from common.configmgr import ConfigMgr
 from common.tradetime import TradeTime
 from backtest.container import Container
+from backtest.api import API
 
 
 class StrategyRunner(object):
@@ -34,11 +35,6 @@ class StrategyRunner(object):
                     datetimes.append(start_time + datetime.timedelta(minutes=i))
             current_date += datetime.timedelta(days=1)
         return datetimes
-
-    @staticmethod
-    def module_patch():
-        exec('from backtest.quantopian import schedule_function, date_rules, time_rules, log')
-        pass
 
     @staticmethod
     def init_strategy(strategy_name, logger):
@@ -74,6 +70,8 @@ class StrategyRunner(object):
                     except Exception as e:
                         logger.error('Trace: ' + traceback.format_exc(), False)
                         logger.error('Error: get action arguments failed:' + str(e))
+            Container.data.set_datetime(datetime.datetime(date.year, date.month, date.day, 16, 0, 0))
+            Container.analysis.add_portfolio_trace(date, Container.api.portfolio)
 
     @staticmethod
     def run_schedule_and_handle_function(schedule_functions, handle_function, start_date, end_date, logger):
@@ -93,9 +91,14 @@ class StrategyRunner(object):
             except Exception as e:
                 logger.error('Trace: ' + traceback.format_exc(), False)
                 logger.error('Error: get action arguments failed:' + str(e))
+            if dt.minute == 0:
+                if (TradeTime.is_half_trade_day(dt.date) and dt.hour == 13) or dt.hour == 16:
+                    Container.analysis.add_portfolio_trace(dt.date(), Container.api.portfolio)
 
     @staticmethod
-    def run(strategy_name, start_date, end_date):
+    def run(strategy_name, start_date, end_date, initial_fund=None):
+        if initial_fund is not None:
+            Container.api = API(Container.data, initial_fund)
         logger = Container.get_logger(strategy_name)
         StrategyRunner.init_strategy(strategy_name, logger)
         schedule_functions = Container.get_schedule_functions(strategy_name)
@@ -104,8 +107,13 @@ class StrategyRunner(object):
             StrategyRunner.run_schedule_only(schedule_functions, start_date, end_date, logger)
         else:
             StrategyRunner.run_schedule_and_handle_function(schedule_functions, handle_function, start_date, end_date, logger)
+        Container.analysis.calc_stats()
+        Container.analysis.plot()
 
 
 if __name__ == '__main__':
     # print BackTest.generate_datetimes(datetime.date(2018, 3, 1), datetime.date(2018, 3, 5))
-    StrategyRunner.run('caa', datetime.date(2017, 1, 1), datetime.date(2018, 4, 11))
+    start = datetime.datetime.now()
+    StrategyRunner.run('caa', datetime.date(2018, 2, 28), datetime.date(2018, 4, 1))
+    end = datetime.datetime.now()
+    print (end-start).seconds

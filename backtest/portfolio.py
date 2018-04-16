@@ -48,14 +48,17 @@ class Portfolio(object):
     def positions_amounts(self):
         return filter(lambda x: x[1] != 0, map(lambda x: [x.symbol, x.amount], self.positions.values()))
 
-    def get_positions_value(self, data):
+    def get_positions_value(self, data, daily_price=False):
         total = 0
         for [symbol, amount] in self.positions_amounts:
-            total += data.get_market_price(symbol) * amount
+            if daily_price:
+                total += data.get_daily_price(symbol) * amount
+            else:
+                total += data.get_market_price(symbol) * amount
         return total
 
-    def get_portfolio_value(self, data):
-        return self.get_positions_value(data) + self.available_funds
+    def get_portfolio_value(self, data, daily_price=False):
+        return self.get_positions_value(data, daily_price) + self.available_funds
 
     def get_percentage(self, symbol, data):
         if symbol in self.positions.keys():

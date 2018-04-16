@@ -3,7 +3,7 @@ from common.pathmgr import PathMgr
 from utils.timezonehelper import convert_to_us_east_dt
 from backtest.data import Data
 from backtest.api import API
-# from backtest.analysis import PortfolioDAO
+from backtest.analysis import Analysis
 from backtest.context import Context
 from backtest.date_rules import EveryDayRule
 from backtest.time_rules import MarketCloseRule
@@ -37,6 +37,8 @@ class Container(object):
 
     current_strategy = None
 
+    analysis = None
+
     _schedule_function_dic = {}
 
     _handle_data_dic = {}
@@ -45,6 +47,7 @@ class Container(object):
     def set_current_strategy(strategy_name):
         Container.current_strategy = strategy_name
         Container.context.strategy_name = strategy_name
+        Container.analysis = Analysis(strategy_name, Container.data)
         if strategy_name in Container._schedule_function_dic.keys():
             Container._schedule_function_dic[strategy_name] = None
 

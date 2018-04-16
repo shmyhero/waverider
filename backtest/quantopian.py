@@ -5,7 +5,6 @@ from backtest.date_rules import EveryDayRule, WeekStartRule, WeekEndRule, MonthS
 from backtest.time_rules import MarketOpenRule, MarketCloseRule
 import inspect
 from backtest.order import OrderStyle, Order
-from backtest.analysis import TradeRecordDAO
 
 
 def schedule_function(func, date_rule, time_rule):
@@ -128,7 +127,7 @@ def order_target(asset, amount, style=OrderStyle.MarketOrder, sec_type='STK'):
     :return:order id
     """
     return Order(Container.api).order_target(asset, amount, style, sec_type,
-                              lambda x, y: TradeRecordDAO.write_trade_trace(Container.current_strategy, x, y, Container.data.specified_date_time))
+                                             lambda x, y: Container.analysis.add_trade_trace(x, y, Container.data.specified_date_time))
 
 
 def order_target_percent(asset, percent, style=OrderStyle.MarketOrder, sec_type='STK'):
@@ -147,7 +146,7 @@ def order_target_percent(asset, percent, style=OrderStyle.MarketOrder, sec_type=
     :return: order id
     """
     return Order(Container.api).order_target_percent(asset, percent, style, sec_type,
-                                      lambda x, y: TradeRecordDAO.write_trade_trace(Container.current_strategy, x, y, Container.data.specified_date_time))
+                                      lambda x, y: Container.analysis.add_trade_trace(x, y, Container.data.specified_date_time))
 
 
 def get_open_orders(asset=None, include_option=False):
