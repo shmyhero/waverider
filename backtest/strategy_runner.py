@@ -10,33 +10,6 @@ from backtest.api import API
 class StrategyRunner(object):
 
     @staticmethod
-    def generate_dates(from_date, end_date):
-        dates = []
-        current_date = from_date
-        while current_date <= end_date:
-            if TradeTime.is_trade_day(current_date):
-                start_date = datetime.date(current_date.year, current_date.month, current_date.day)
-                dates.append(start_date)
-            current_date += datetime.timedelta(days=1)
-        return dates
-
-    @staticmethod
-    def generate_datetimes(from_date, end_date):
-        datetimes = []
-        current_date = from_date
-        while current_date <= end_date:
-            if TradeTime.is_trade_day(current_date):
-                start_time = datetime.datetime(current_date.year, current_date.month, current_date.day, 9, 31, 0)
-                if TradeTime.is_half_trade_day(current_date):
-                    count = 180
-                else:
-                    count = 390
-                for i in range(count):
-                    datetimes.append(start_time + datetime.timedelta(minutes=i))
-            current_date += datetime.timedelta(days=1)
-        return datetimes
-
-    @staticmethod
     def init_strategy(strategy_name, logger):
         """
         initialize strategy, it does not support parallel running with same strategy name.
@@ -54,7 +27,7 @@ class StrategyRunner(object):
 
     @staticmethod
     def run_schedule_only(schedule_functions, start_date, end_date, logger):
-        for date in StrategyRunner.generate_dates(start_date, end_date):
+        for date in TradeTime.generate_dates(start_date, end_date):
             sf_dt_list = map(lambda x: [x, x.time_rule.get_datetime(date)], schedule_functions)
             sf_dt_list.sort(key=lambda x: x[1])
             for sf_dt in sf_dt_list:
@@ -75,7 +48,7 @@ class StrategyRunner(object):
 
     @staticmethod
     def run_schedule_and_handle_function(schedule_functions, handle_function, start_date, end_date, logger):
-        for dt in StrategyRunner.generate_datetimes(start_date, end_date):
+        for dt in TradeTime.generate_datetimes(start_date, end_date):
             if Container.context.terminate_p:
                 return
             Container.data.set_datetime(dt)
@@ -114,6 +87,6 @@ class StrategyRunner(object):
 if __name__ == '__main__':
     # print BackTest.generate_datetimes(datetime.date(2018, 3, 1), datetime.date(2018, 3, 5))
     start = datetime.datetime.now()
-    StrategyRunner.run('caa', datetime.date(2018, 2, 28), datetime.date(2018, 4, 1))
+    StrategyRunner.run('caa', datetime.date(2017, 12, 29), datetime.date(2018, 4, 12))
     end = datetime.datetime.now()
     print (end-start).seconds

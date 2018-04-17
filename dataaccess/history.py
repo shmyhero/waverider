@@ -68,7 +68,7 @@ class BackTestDBProvider(AbstractHistoricalDataProvider):
         yahoo_symbol = Symbols.get_mapped_symbol(symbol, Symbols.YahooSymbolMapping)
         from_date = TradeTime.get_from_date_by_window(window+1, current_date)  # window + 1: get one day more data.
         rows = YahooEquityDAO().get_equity_prices_by_start_end_date(yahoo_symbol, from_date, current_date, price_field)
-        return rows[1:]  # remove current date data.
+        return rows[0:window]  # remove current date data.
 
     def history_min(self, symbol, window, current_date_time):
         # us_dt = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))

@@ -64,7 +64,8 @@ def caa_rebalance(context, data):
         for stock in weights.index:
             if stock not in ['BIL']:
                 percent = round(weights[stock], 3) * context.caa_total_ratio
-                order_target_ratio(context, data, stock, percent)
+                # order_target_ratio(context, data, stock, percent)
+                order_target_percent(stock, percent)
     except Exception as e:
         log.error('Trace: ' + traceback.format_exc())
         log.error(str(e))

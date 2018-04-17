@@ -61,7 +61,6 @@ class BaseDAO(object):
     #         self.conn.close()
 
 
-
 class YahooEquityDAO(BaseDAO):
 
     def __init__(self):

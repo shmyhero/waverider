@@ -124,6 +124,55 @@ class TradeTime(object):
                         count +=1
         return current_date
 
+    @staticmethod
+    def generate_dates(from_date, end_date):
+        dates = []
+        current_date = from_date
+        while current_date <= end_date:
+            if TradeTime.is_trade_day(current_date):
+                start_date = datetime.date(current_date.year, current_date.month, current_date.day)
+                dates.append(start_date)
+            current_date += datetime.timedelta(days=1)
+        return dates
+
+    @staticmethod
+    def generate_trade_dates_by_window(window, end_date):
+        count = 0
+        dates = []
+        current_date = end_date
+        while count < window:
+            if TradeTime.is_trade_day(current_date):
+                dates.append(current_date)
+                count = count+1
+            current_date = current_date - datetime.timedelta(days=1)
+        dates.reverse()
+        return dates
+
+    @staticmethod
+    def generate_datetimes(from_date, end_date):
+        datetimes = []
+        current_date = from_date
+        while current_date <= end_date:
+            if TradeTime.is_trade_day(current_date):
+                start_time = datetime.datetime(current_date.year, current_date.month, current_date.day, 9, 31, 0)
+                if TradeTime.is_half_trade_day(current_date):
+                    count = 180
+                else:
+                    count = 390
+                for i in range(count):
+                    datetimes.append(start_time + datetime.timedelta(minutes=i))
+            current_date += datetime.timedelta(days=1)
+        return datetimes
+
+    @staticmethod
+    def generate_trade_datetimes_by_window(window, end_datetime):
+        end_date = end_datetime.date()
+        date_window = window/390 + 2
+        dates = TradeTime.generate_trade_dates_by_window(date_window, end_date)
+        datetimes = TradeTime.generate_datetimes(dates[0], dates[-1])
+        datetimes = filter(lambda x: x <= end_datetime, datetimes)
+        return datetimes[-window-1:]
+
 
 if __name__ == '__main__':
     #print TradeTime.get_trading_close_holidays(2017)
@@ -146,3 +195,6 @@ if __name__ == '__main__':
     #print TradeTime.get_latest_trade_date()
     print TradeTime.get_from_date_by_window(252)
     print TradeTime.get_from_date_by_window(1)
+    print '-' * 20
+    print TradeTime.generate_trade_dates_by_window(5, datetime.date.today())
+    print TradeTime.generate_trade_datetimes_by_window(391, datetime.datetime.now())
