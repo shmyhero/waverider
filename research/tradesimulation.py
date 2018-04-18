@@ -1,6 +1,6 @@
 import math
 import datetime
-from utils.cachehelper import CacheMan
+from utils.cachehelper import FunctionCache
 from common.tradetime import TradeTime
 from dataaccess.db import YahooEquityDAO
 
@@ -27,10 +27,10 @@ class DataProvider(object):
             result[int(d.strftime('%Y%m%d'))] = v
         return result
 
-
     @staticmethod
     def get_equity_price_records(symbol):
-        return CacheMan('yahoo_equity_price').get_with_cache(symbol, DataProvider._get_equity_price_list_as_dic)
+        # return CacheMan('yahoo_equity_price').get_with_cache(symbol, DataProvider._get_equity_price_list_as_dic)
+        return FunctionCache.run(DataProvider._get_equity_price_list_as_dic, symbol)
 
     @staticmethod
     def find_price(date_price_dic, the_date, recusion_count = 10):

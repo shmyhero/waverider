@@ -1,5 +1,6 @@
 import datetime
 import pandas as pd
+from utils.listhelper import list_to_hash
 from common.tradetime import TradeTime
 from dataaccess.history import BackTestDBProvider
 
@@ -59,7 +60,18 @@ class Data(object):
         return market_price
 
     def get_daily_price(self, symbol):
-        return self.history(symbol, window=1)[0]
+        # return self.history(symbol, window=1)[0]
+        date = self.specified_date_time.date()
+        if symbol in self.provider.cache.keys() and date >= self.provider.cache[symbol][0]:
+            dic = self.provider.cache[symbol][1]
+            return dic[date]
+        else:
+            window = len(TradeTime.generate_dates(date, TradeTime.get_latest_trade_date()))
+            rows = self.provider.history(symbol, 'price', window, TradeTime.get_latest_trade_date())
+            dic = list_to_hash(rows)
+            self.provider.cache[symbol] = [rows[0][0], dic]
+            return dic[date]
+
 
 
 if __name__ == '__main__':

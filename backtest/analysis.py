@@ -18,7 +18,7 @@ class Analysis(object):
         self.trade_trace.append([dt, asset, amount])
 
     def add_portfolio_trace(self, dt, portfolio):
-        self.portfolio_trace.append([dt, portfolio, portfolio.get_portfolio_value(self.data, False)])
+        self.portfolio_trace.append([dt, portfolio, portfolio.get_portfolio_value(self.data, True)])
 
     def get_netliquidations(self):
         return map(lambda x: [x[0], x[2]], self.portfolio_trace)

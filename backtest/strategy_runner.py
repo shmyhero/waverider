@@ -39,7 +39,10 @@ class StrategyRunner(object):
                     Container.data.set_datetime(dt)
                     logger.set_dt(dt)
                     try:
+                        start = datetime.datetime.now()
                         schedule_function.my_func()
+                        end = datetime.datetime.now()
+                        logger.info('Spend time for schedule function: %s seconds' % (end - start).seconds)
                     except Exception as e:
                         logger.error('Trace: ' + traceback.format_exc(), False)
                         logger.error('Error: get action arguments failed:' + str(e))
@@ -87,6 +90,8 @@ class StrategyRunner(object):
 if __name__ == '__main__':
     # print BackTest.generate_datetimes(datetime.date(2018, 3, 1), datetime.date(2018, 3, 5))
     start = datetime.datetime.now()
+    from datasimulation.dataprovider import MontCarloDataProvider
+    Container.data.provider = MontCarloDataProvider()
     StrategyRunner.run('caa', datetime.date(2017, 12, 29), datetime.date(2018, 4, 12))
     end = datetime.datetime.now()
     print (end-start).seconds

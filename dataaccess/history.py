@@ -56,7 +56,7 @@ class DBProvider(AbstractHistoricalDataProvider):
 class BackTestDBProvider(AbstractHistoricalDataProvider):
 
     def __init__(self):
-        pass
+        self.cache = {}
 
     def history(self, symbol, field, window, current_date):
         fields_dic = {'open': 'openPrice', 'close': 'adjclosePrice', 'high': 'highPrice', 'low': 'lowPrice',

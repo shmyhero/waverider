@@ -2,6 +2,7 @@ import datetime
 import math
 import numpy as np
 import pandas as pd
+from utils.cachehelper import FunctionCache
 from dataaccess.db import YahooEquityDAO
 
 
@@ -68,14 +69,25 @@ class MontCarlo(object):
 class MontCarloSimulator(object):
 
     @staticmethod
+    def _get_min_records(symbol, start, end):
+        return YahooEquityDAO().get_min_time_and_price(symbol, start, end)
+
+    @staticmethod
+    def _get_daily_records(symbol, start, end):
+        return YahooEquityDAO().get_equity_prices_by_start_end_date(symbol, start, end)
+
+    @staticmethod
     def simulate_min(symbol, start, end, window, times):
-        rows = YahooEquityDAO().get_min_time_and_price(symbol, start, end)
+        # rows = YahooEquityDAO().get_min_time_and_price(symbol, start, end)
+        FunctionCache.run(MontCarloSimulator._get_min_records, (symbol, start, end))
+        rows = FunctionCache.run()
         prices = pd.Series(map(lambda x: x[1], rows), index=map(lambda x: x[0], rows))
         return MontCarlo(prices).brownian_motion2(window, times, 390)
 
     @staticmethod
     def simulate_daily(symbol, start, end, window, times):
-        rows = YahooEquityDAO().get_equity_prices_by_start_end_date(symbol, start, end)
+        # rows = YahooEquityDAO().get_equity_prices_by_start_end_date(symbol, start, end)
+        rows = FunctionCache.run(MontCarloSimulator._get_daily_records, (symbol , start, end))
         prices = pd.Series(map(lambda x: x[1], rows), index=map(lambda x: x[0], rows))
         return MontCarlo(prices).brownian_motion2(window, times, 252)
 
