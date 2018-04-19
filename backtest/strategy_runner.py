@@ -90,8 +90,8 @@ class StrategyRunner(object):
 if __name__ == '__main__':
     # print BackTest.generate_datetimes(datetime.date(2018, 3, 1), datetime.date(2018, 3, 5))
     start = datetime.datetime.now()
-    from datasimulation.dataprovider import MontCarloDataProvider
-    Container.data.provider = MontCarloDataProvider()
-    StrategyRunner.run('caa', datetime.date(2017, 12, 29), datetime.date(2018, 4, 12))
+    # from datasimulation.dataprovider import MontCarloDataProvider
+    # Container.data.provider = MontCarloDataProvider()
+    StrategyRunner.run('caa', datetime.date(2016, 12, 29), datetime.date(2018, 4, 12))
     end = datetime.datetime.now()
     print (end-start).seconds

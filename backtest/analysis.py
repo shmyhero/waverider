@@ -3,6 +3,7 @@ import math
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from data import Data
 import ffn
 
 class Analysis(object):
@@ -32,7 +33,7 @@ class Analysis(object):
     def plot(self):
         dates = map(lambda x: x[0], self.portfolio_trace)
         returns = self.get_returns()
-        spy_values = self.data.history('SPY', window=len(returns)).values
+        spy_values = Data().history('SPY', window=len(returns)).values
         bench_mark_returns = self.get_returns(spy_values)
         fig, ax = plt.subplots()
         ax.plot(dates, returns, label=self.strategy_name)
