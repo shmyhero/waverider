@@ -15,7 +15,8 @@ class MontCarloDataProvider(AbstractHistoricalDataProvider):
     def _generate_historical_daily(self, symbol, window, current_date):
         dates = TradeTime.generate_trade_dates_by_window(window + 1, current_date)
         start_date = dates[0]
-        end_date = current_date
+        # end_date = current_date
+        end_date = TradeTime.get_latest_trade_date()
         all_dates = TradeTime.generate_dates(start_date, TradeTime.get_latest_trade_date())
         prices = MontCarloSimulator.simulate_daily(symbol, start_date, end_date, len(all_dates), 1)
         rows = map(lambda x, y: [x, y], all_dates, prices[0])

@@ -45,7 +45,7 @@ class StrategyRunner(object):
                         logger.info('Spend time for schedule function: %s seconds' % (end - start).seconds)
                     except Exception as e:
                         logger.error('Trace: ' + traceback.format_exc(), False)
-                        logger.error('Error: get action arguments failed:' + str(e))
+                        logger.error('Error: get action arguments failed: %s, %s' % (str(e), traceback.format_exc()))
             Container.data.set_datetime(datetime.datetime(date.year, date.month, date.day, 16, 0, 0))
             Container.analysis.add_portfolio_trace(date, Container.api.portfolio)
 
@@ -72,7 +72,7 @@ class StrategyRunner(object):
                     Container.analysis.add_portfolio_trace(dt.date(), Container.api.portfolio)
 
     @staticmethod
-    def run(strategy_name, start_date, end_date, initial_fund=None):
+    def run(strategy_name, start_date, end_date, initial_fund=None, plot=True):
         if initial_fund is not None:
             Container.api = API(Container.data, initial_fund)
         logger = Container.get_logger(strategy_name)
@@ -84,7 +84,8 @@ class StrategyRunner(object):
         else:
             StrategyRunner.run_schedule_and_handle_function(schedule_functions, handle_function, start_date, end_date, logger)
         Container.analysis.calc_stats()
-        Container.analysis.plot()
+        if plot:
+            Container.analysis.plot()
 
 
 if __name__ == '__main__':
