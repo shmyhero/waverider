@@ -69,7 +69,10 @@ class Container(object):
 
     @staticmethod
     def get_schedule_functions(strategy_name):
-        return Container._schedule_function_dic[strategy_name]
+        if Container._schedule_function_dic.has_key(strategy_name):
+            return Container._schedule_function_dic[strategy_name]
+        else:
+            return []
 
     @staticmethod
     def get_handle_function(strategy_name):

@@ -68,7 +68,7 @@ class StrategyRunner(object):
                 logger.error('Trace: ' + traceback.format_exc(), False)
                 logger.error('Error: get action arguments failed:' + str(e))
             if dt.minute == 0:
-                if (TradeTime.is_half_trade_day(dt.date) and dt.hour == 13) or dt.hour == 16:
+                if (TradeTime.is_half_trade_day(dt.date()) and dt.hour == 13) or dt.hour == 16:
                     Container.analysis.add_portfolio_trace(dt.date(), Container.api.portfolio)
 
     @staticmethod
@@ -93,6 +93,6 @@ if __name__ == '__main__':
     start = datetime.datetime.now()
     # from datasimulation.dataprovider import MontCarloDataProvider
     # Container.data.provider = MontCarloDataProvider()
-    StrategyRunner.run('caa', datetime.date(2016, 12, 29), datetime.date(2018, 4, 12))
+    StrategyRunner.run('rsi', datetime.date(2018, 4, 11), datetime.date(2018, 4, 12))
     end = datetime.datetime.now()
     print (end-start).seconds

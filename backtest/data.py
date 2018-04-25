@@ -89,3 +89,5 @@ if __name__ == '__main__':
     # print Data().current(['SVXY', 'VIX'])
     # print data.history(['SVXY', 'VIX'], window=1, frequency='1m').iloc[0][0]
     # print Data().current(['SVXY', 'VIX'])[0]
+    data.set_datetime(datetime.datetime(2018, 1, 5, 9, 31, 0))
+    print data.get_market_price('GLD')
