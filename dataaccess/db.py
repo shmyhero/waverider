@@ -130,7 +130,22 @@ class YahooEquityDAO(BaseDAO):
         else:
             return self.get_min_time_and_price_from_min(symbol, start_time, end_time)
 
+    def get_equity_30_min_prices_by_start_end_date(self, symbol, start_time=datetime.datetime(1971, 1, 1, 0, 0, 0), end_time=datetime.datetime(9999, 1, 1, 0, 0, 0), price_field='closePrice'):
+        query_template = """select tradeTime, {} from equity_30min where symbol = '{}' and tradeTime >= '{}' and tradeTime<= '{}' order by tradeTime """
+        query = query_template.format(price_field, symbol, start_time, end_time)
+        rows = self.select(query)
+        return rows
+
+    def get_latest_equity_30_min_prices(self, symbol, window=100, price_field='closePrice', end_time=datetime.datetime(9999, 1, 1, 0, 0, 0)):
+        query_template = """select tradeTime, {} from equity_30min where symbol = '{}' and tradeTime <= '{}' order by tradeTime desc limit {}"""
+        query = query_template.format(price_field, symbol, end_time, window)
+        rows = self.select(query)
+        rows.reverse()
+        return rows
+
 
 if __name__ == '__main__':
-    print YahooEquityDAO().get_equity_prices_by_start_end_date('SPY', datetime.datetime(2018, 1, 1, 0, 0, 0), datetime.datetime(2018, 3, 1, 0, 0, 0))
+    # print YahooEquityDAO().get_equity_prices_by_start_end_date('SPY', datetime.datetime(2018, 1, 1, 0, 0, 0), datetime.datetime(2018, 3, 1, 0, 0, 0))
     # print YahooEquityDAO().get_min_time_and_price('SPY', datetime.datetime(2018, 4, 1, 0, 0, 0), datetime.datetime(2018, 4, 3, 0, 0, 0))
+    # print YahooEquityDAO().get_equity_30_min_prices_by_start_end_date('510050', datetime.datetime(2018, 1, 1, 0, 0, 0), datetime.datetime(2018, 3, 1, 0, 0, 0))
+    print YahooEquityDAO().get_latest_equity_30_min_prices('510050')

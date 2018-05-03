@@ -52,6 +52,8 @@ class DBProvider(AbstractHistoricalDataProvider):
         rows = YahooEquityDAO().get_min_time_and_price(symbol, start_time, end_time)
         return rows[-window:]
 
+    def history_30_min(self, symbol, window):
+        return YahooEquityDAO().get_latest_equity_30_min_prices(symbol, window)
 
 class BackTestDBProvider(AbstractHistoricalDataProvider):
 

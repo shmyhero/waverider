@@ -33,6 +33,14 @@ class Data(object):
                 self.get_logger().error('Trace: ' + traceback.format_exc(), True)
                 self.get_logger().error('Error: get historical minutes data failed:' + str(e))
 
+    def _get_history_30min(self, symbol,window):
+        for provider in self.historical_data_provider_lst:
+            try:
+                return provider.history_30_min(symbol, window)
+            except Exception as e:
+                self.get_logger().error('Trace: ' + traceback.format_exc(), True)
+                self.get_logger().error('Error: get historical minutes data failed:' + str(e))
+
     def history(self, assets, field='price', window=30, frequency='1d'):
         """
         get the history data
@@ -52,6 +60,9 @@ class Data(object):
                 elif frequency == '1m':
                     columns[0] = 'minute'
                     rows = self._get_history_min(symbol, window)
+                elif frequency == '30m':
+                    columns[0] = '30min'
+                    rows = self._get_history_30min(symbol, window)
                 if results is None:
                     results = map(list, rows)
                 else:
@@ -66,6 +77,8 @@ class Data(object):
                 rows = self._get_history_daily(symbol, field, window)
             elif frequency == '1m':
                 rows = self._get_history_min(symbol, window)
+            elif frequency == '30m':
+                rows = self._get_history_30min(symbol, window)
             if len(rows) > window:
                 rows = rows[:window]
             series = pd.Series(map(lambda x: x[1], rows), index=map(lambda x: x[0], rows))
