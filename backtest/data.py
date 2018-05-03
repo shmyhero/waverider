@@ -26,6 +26,9 @@ class Data(object):
                 elif frequency == '1m':
                     columns[0] = 'minute'
                     rows = self.provider.history_min(symbol, window, self.specified_date_time)
+                elif frequency == '30m':
+                    columns[0] = '30min'
+                    rows = self.provider.history_30min(symbol, window, self.specified_date_time)
                 if results is None:
                     results = map(list, rows)
                 else:
@@ -40,6 +43,8 @@ class Data(object):
                 rows = self.provider.history(symbol, field, window, self.specified_date_time.date())
             elif frequency == '1m':
                 rows = self.provider.history_min(symbol, window, self.specified_date_time)
+            elif frequency == '30m':
+                rows = self.provider.history_30_min(symbol, window, self.specified_date_time)
             if len(rows) > window:
                 rows = rows[:window]
             series = pd.Series(map(lambda x: x[1], rows), index=map(lambda x: x[0], rows))
@@ -73,7 +78,6 @@ class Data(object):
             return dic[date]
 
 
-
 if __name__ == '__main__':
     data = Data()
     data.set_datetime(datetime.datetime(2018, 3, 5, 9, 30, 0))
@@ -91,3 +95,4 @@ if __name__ == '__main__':
     # print Data().current(['SVXY', 'VIX'])[0]
     data.set_datetime(datetime.datetime(2018, 1, 5, 9, 31, 0))
     print data.get_market_price('GLD')
+    print data.history('510050', frequency='30m', window=50)
