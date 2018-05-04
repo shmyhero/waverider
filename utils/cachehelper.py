@@ -19,11 +19,18 @@ if __name__ == '__main__':
     def add(num1, num2):
         print 'run add function'
         return num1 + num2
+
     def foo():
         print 'run foo'
         return 'foo'
+
+    def foo1(symbol):
+        print 'run foo1 %s' % symbol
+        return 'foo1'
     print FunctionCache.run(add, (5, 1))
     print FunctionCache.run(add, (5, 1))
     print FunctionCache.run(foo, ())
     print FunctionCache.run(foo, ())
+    print FunctionCache.run(foo1, ('QQQ', ))
+    print FunctionCache.run(foo1, ('QQQ',))
 

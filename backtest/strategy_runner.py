@@ -42,7 +42,7 @@ class StrategyRunner(object):
                         start = datetime.datetime.now()
                         schedule_function.my_func()
                         end = datetime.datetime.now()
-                        logger.info('Spend time for schedule function: %s seconds' % (end - start).seconds)
+                        # logger.info('Spend time for schedule function: %s seconds' % (end - start).seconds)
                     except Exception as e:
                         logger.error('Trace: ' + traceback.format_exc(), False)
                         logger.error('Error: get action arguments failed: %s, %s' % (str(e), traceback.format_exc()))
@@ -93,6 +93,6 @@ if __name__ == '__main__':
     start = datetime.datetime.now()
     # from datasimulation.dataprovider import MontCarloDataProvider
     # Container.data.provider = MontCarloDataProvider()
-    StrategyRunner.run('rsi', datetime.date(2018, 4, 11), datetime.date(2018, 4, 12))
+    StrategyRunner.run('macdspy', datetime.date(2018, 4, 1), datetime.date(2018, 4, 30))
     end = datetime.datetime.now()
     print (end-start).seconds

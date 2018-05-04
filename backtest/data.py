@@ -69,7 +69,11 @@ class Data(object):
         date = self.specified_date_time.date()
         if symbol in self.provider.cache.keys() and date >= self.provider.cache[symbol][0]:
             dic = self.provider.cache[symbol][1]
-            return dic[date]
+            for i in range(15):
+                if date not in dic:
+                    date = date - datetime.timedelta(days=1)
+                else:
+                    return dic[date]
         else:
             window = len(TradeTime.generate_dates(date, TradeTime.get_latest_trade_date()))
             rows = self.provider.history(symbol, 'price', window, TradeTime.get_latest_trade_date())
@@ -80,19 +84,19 @@ class Data(object):
 
 if __name__ == '__main__':
     data = Data()
-    data.set_datetime(datetime.datetime(2018, 3, 5, 9, 30, 0))
+    data.set_datetime(datetime.datetime(2018, 3, 5, 9, 31, 0))
     # print data.history('SPY', window=5)
 
     # NOT include current datetime.
-    print data.history(['SPY', 'QQQ'], window=5)
-    # print data.history('SVXY', window=60, frequency='1m')
-    print data.history(['SVXY', 'VIX'], window=60, frequency='1m')
+    # print data.history(['SPY', 'QQQ'], window=5)
+    print data.history('SVXY', window=390, frequency='1m')
+    # print data.history(['SVXY', 'VIX'], window=60, frequency='1m')
     # print data.history(['SVXY', 'VIX'], window=1, frequency='1m')
     # print data.current('SVXY')
-    print data.current(['SVXY', 'VIX'])
+    # print data.current(['SVXY', 'VIX'])
     # print Data().current(['SVXY', 'VIX'])
     # print data.history(['SVXY', 'VIX'], window=1, frequency='1m').iloc[0][0]
     # print Data().current(['SVXY', 'VIX'])[0]
-    data.set_datetime(datetime.datetime(2018, 1, 5, 9, 31, 0))
-    print data.get_market_price('GLD')
-    print data.history('510050', frequency='30m', window=50)
+    # data.set_datetime(datetime.datetime(2018, 1, 5, 9, 31, 0))
+    # print data.get_market_price('GLD')
+    # print data.history('510050', frequency='30m', window=120)
