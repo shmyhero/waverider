@@ -9,9 +9,8 @@ from utils.indicator import MACD
 
 def initialize(context):
     context.hold = False
-
-    for i in range(13):
-        schedule_function(func=my_func, date_rule=date_rules.every_day(), time_rule=time_rules.market_open(minutes=i*30+1))
+    for min in [1, 31, 61, 91, 211, 241, 271, 301]:
+        schedule_function(func=my_func, date_rule=date_rules.every_day(), time_rule=time_rules.market_open(minutes=min))
 
 
 def get_max_bar(macd_bar):
@@ -37,7 +36,7 @@ def get_min_bar(macd_bar):
 
 
 def my_func(context, data):
-    symbol = 'SPY'
+    symbol = '510050'
     records = data.history(symbol, window=120, frequency='30m')
     macd_list = MACD.get_all_macd(records.values, s=7, l=19, m=26)
     macd_bar = map(lambda x: x[-1], macd_list)
