@@ -21,6 +21,16 @@ class USTradingCalendar(AbstractHolidayCalendar):
 class TradeTime(object):
 
     _holidays_cache = {}
+    _special_no_trade_dates = [
+        datetime.date(2001, 9, 11),
+        datetime.date(2001, 9, 12),
+        datetime.date(2001, 9, 13),
+        datetime.date(2001, 9, 14),
+        datetime.date(2004, 6, 11),
+        datetime.date(2007, 1, 2),
+        datetime.date(2012, 10, 29),
+        datetime.date(2012, 10, 30),
+    ]
 
     def __init__(self):
         pass
@@ -37,6 +47,8 @@ class TradeTime(object):
 
     @staticmethod
     def is_trade_day(date):
+        if date in TradeTime._special_no_trade_dates:
+            return False
         trading_close_holidays = TradeTime._holidays_cache.get(date.year)
         if trading_close_holidays is None:
             trading_close_holidays = TradeTime.get_trading_close_holidays(date.year)
