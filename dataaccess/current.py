@@ -31,10 +31,15 @@ class YahooScraper(AbstractCurrentDataProvider):
         url = 'https://finance.yahoo.com/quote/%s/' % yahoo_symbol
         get_logger().info('Http request to: %s' % url, False)
         content = HttpHelper.http_get(url)
-        content = string_fetch(content, 'Currency in USD', 'At close:')
-        content = string_fetch(content, 'react-text', 'react-text')
-        value = string_fetch(content, '-->', '<!--')
-        return float(value.replace(',', ''))
+        try:
+            sub_content = string_fetch(content, 'Currency in USD', 'At close:')
+            sub_content = string_fetch(sub_content, 'react-text', 'react-text')
+            value = string_fetch(sub_content, '-->', '<!--')
+            return float(value.replace(',', ''))
+        except Exception:
+            sub_content = string_fetch(content, '\"close\":', ',')
+            value = round(float(sub_content), 2)
+            return value
 
     def get_current_data(self, symbols):
         try:
