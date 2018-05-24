@@ -38,6 +38,7 @@ class Analysis(object):
         fig, ax = plt.subplots()
         ax.plot(dates, returns, label=self.strategy_name)
         ax.plot(dates, bench_mark_returns, label='SPY')
+        ax.grid()
         plt.legend(bbox_to_anchor=(1.05, 1), loc=8, borderaxespad=0.)
         plt.show()
 
