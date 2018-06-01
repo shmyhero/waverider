@@ -49,11 +49,26 @@ if __name__ == '__main__':
     # print data.history('SPY', 'open', 1)[0]
     # print data.current('SPY')
     # s = data.history('SPY', field='close', window=5)
-    print data.history('510050', "price", 30, "30m")
+    # print data.history('SPY', "price", 391, "1m")
+    # print data.current('QQQ')
     # print s
     # import numpy as np
     # print s.shift(2) / 100 * np.sqrt(21) / np.sqrt(252)
     # print 1.25 * np.sqrt(21) / np.sqrt(252)/100
+    s = data.history('SPY', field='high', window=120)
+    indexes = s.index
+    high_list = s.tolist()
+    low_list = data.history('SPY', field='low', window=120).tolist()
+    # print high_list, low_list
+    from utils.indicator import SAR
+    sar_list = SAR.get_all_sar(high_list, low_list, 0.04, 0.02, 0.2)
+    for i in range(len(indexes)):
+        print indexes[i], sar_list[i]
+
+    # from utils.indicator import RSI
+    # print RSI.get_rsi(price_list)
+    # print RSI.get_rsi2(price_list)
+
 
 
 
