@@ -7,7 +7,7 @@ import inspect
 from backtest.order import OrderStyle, Order
 
 
-def schedule_function(func, date_rule, time_rule):
+def schedule_function(func, date_rule, time_rule, half_days = True):
     """
     We provide the schedule_function method that lets your algorithm specify
     when methods are run by using date and/or time rules.
@@ -17,7 +17,7 @@ def schedule_function(func, date_rule, time_rule):
     :param time_rule: time rule for triggering schedule function, please refer to time_rules class.
     :return:
     """
-    Container.schedule_function(func, date_rule, time_rule)
+    Container.schedule_function(func, date_rule, time_rule, half_days)
 
 
 class date_rules(object):

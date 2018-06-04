@@ -40,7 +40,10 @@ class StrategyRunner(object):
                     logger.set_dt(dt)
                     try:
                         start = datetime.datetime.now()
-                        schedule_function.my_func()
+                        if TradeTime.is_half_trade_day(dt.date()) and schedule_function.half_days is False:
+                            pass
+                        else:
+                            schedule_function.my_func()
                         end = datetime.datetime.now()
                         # logger.info('Spend time for schedule function: %s seconds' % (end - start).seconds)
                     except Exception as e:

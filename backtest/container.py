@@ -1,6 +1,7 @@
 from backtest.backtestlogger import DailyBackTestLoggerFactory
-from common.pathmgr import PathMgr
 from utils.timezonehelper import convert_to_us_east_dt
+from common.tradetime import TradeTime
+from common.pathmgr import PathMgr
 from backtest.data import Data
 from backtest.api import API
 from backtest.analysis import Analysis
@@ -11,13 +12,16 @@ from backtest.time_rules import MarketCloseRule
 
 class ScheduleFunction(object):
 
-    def __init__(self, my_func, date_rule, time_rule):
+    def __init__(self, my_func, date_rule, time_rule, half_days = True):
         self.my_func = my_func
         self.date_rule = date_rule
         self.time_rule = time_rule
+        self.half_days = half_days
 
     def run(self, current_time):
         dt = convert_to_us_east_dt(current_time)
+        if TradeTime.is_half_trade_day(dt.date()) and self.half_days is False:
+            return
         # if you want to run the schedule function immediately,
         # you would need to add below 2 line code, given the correct time interval.
         # dt += datetime.timedelta(hours=12, minutes=33)
@@ -86,7 +90,7 @@ class Container(object):
         return DailyBackTestLoggerFactory.get_logger(PathMgr.get_log_path('BackTest/%s'%strategy_name))
 
     @staticmethod
-    def schedule_function(func, date_rule, time_rule):
-        schedule_func = ScheduleFunction(lambda: func(Container.context, Container.data), date_rule, time_rule)
+    def schedule_function(func, date_rule, time_rule, half_days=True):
+        schedule_func = ScheduleFunction(lambda: func(Container.context, Container.data), date_rule, time_rule, half_days)
         Container.register_schedule_function(schedule_func)
 

@@ -2,6 +2,7 @@ import datetime
 import pytz
 from utils.logger import DailyLoggerFactory
 from utils.timezonehelper import convert_to_us_east_dt
+from common.tradetime import TradeTime
 from common.pathmgr import PathMgr
 from wrapi.context import Context
 from wrapi.data import Data
@@ -12,10 +13,11 @@ from wrapi.time_rules import MarketCloseRule
 
 class ScheduleFunction(object):
 
-    def __init__(self, my_func, date_rule, time_rule):
+    def __init__(self, my_func, date_rule, time_rule, half_days=True):
         self.my_func = my_func
         self.date_rule = date_rule
         self.time_rule = time_rule
+        self.half_days = half_days
 
     def run(self, current_time):
         dt = convert_to_us_east_dt(current_time)
@@ -23,6 +25,8 @@ class ScheduleFunction(object):
         # you would need to add below 2 line code, given the correct time interval.
         # dt += datetime.timedelta(hours=12, minutes=33)
         # print dt
+        if TradeTime.is_half_trade_day(dt.date()) and self.half_days is False:
+            return
         if self.date_rule.validate(dt) and self.time_rule.validate(dt):
             self.my_func()
 
@@ -80,7 +84,7 @@ class Container(object):
         return DailyLoggerFactory.get_logger(strategy_name, PathMgr.get_log_path(strategy_name))
 
     @staticmethod
-    def schedule_function(func, date_rule, time_rule):
-        schedule_func = ScheduleFunction(lambda: func(Container.context, Container.data), date_rule, time_rule)
+    def schedule_function(func, date_rule, time_rule, half_days=True):
+        schedule_func = ScheduleFunction(lambda: func(Container.context, Container.data), date_rule, time_rule, half_days)
         Container.register_schedule_function(schedule_func)
 
