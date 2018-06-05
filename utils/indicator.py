@@ -50,66 +50,76 @@ class MACD(object):
             [ema_short, ema_long, dif, dea, bar] = record
         return result
 
-import talib
-import numpy
+# import talib
+# import numpy
+
 
 class RSI(object):
 
-    # @staticmethod
-    # def get_rsi_by_delta_price_list(delta_list):
-    #     positive_sum = sum(filter(lambda x: x > 0, delta_list))
-    #     negative_sum = -sum(filter(lambda x: x < 0, delta_list))
-    #     if positive_sum == negative_sum:
-    #         return 50
-    #     else:
-    #         return 100.0*positive_sum/(positive_sum + negative_sum)
-
     @staticmethod
-    def get_rsi(price_list):
-        if price_list < 2:
-            return 50
-        positive_sum = 0
-        negative_sum = 0
-        for i in range(len(price_list)-1):
-            delta = price_list[i+1] - price_list[i]
-            if delta > 0:
-                positive_sum += delta
-            else:
-                negative_sum -= delta
-        if positive_sum == negative_sum:
-            return 50
-        else:
-            return 100.0*positive_sum/(positive_sum + negative_sum)
-
-    @staticmethod
-    def get_rsi2(price_list):
-        if price_list < 2:
-            return 50
-        positive_list = []
-        abs_list = []
+    def get_init_rsi(price_list):
         count = len(price_list)-1
+        up_sum = 0
+        down_sum = 0
         for i in range(count):
             delta = price_list[i+1] - price_list[i]
             if delta > 0:
-                positive_list.append(delta)
-                abs_list.append(delta)
+                up_sum += delta
             else:
-                positive_list.append(0)
-                abs_list.append(-delta)
-        return 100.0 * MACD.get_all_ema(positive_list, count)[-1]/MACD.get_all_ema(abs_list, count)[-1]
-
+                down_sum -= delta
+        up_ave = up_sum*1.0 / count
+        down_ave = down_sum * 1.0 / count
+        rsi = 100.0*up_sum/(up_sum + down_sum)
+        return up_ave, down_ave, rsi
 
     @staticmethod
-    def get_rsi3(price_list):
-        rsi = talib.RSI(numpy.array(price_list), len(price_list)-1)
-        # print rsi
-        return rsi[-1]
+    def calc_new_rsi(time_period, delta, rsi_obj):
+        if delta > 0:
+            up = delta*1.0
+            down = 0
+        else:
+            up = 0
+            down = -delta*1.0
+        previous_up, previous_down, previous_rsi = rsi_obj
+        new_up = up/time_period + previous_up*(time_period-1)/time_period
+        new_down = down/time_period + previous_down * (time_period - 1) / time_period
+        rsi = 100 * new_up/(new_up + new_down)
+        return new_up, new_down, rsi
+
+    @staticmethod
+    def get_new_rsi(time_period, price, previous_price, rsi_object=None):
+        delta = price-previous_price
+        return RSI.calc_new_rsi(time_period, delta, rsi_object)
+
+    @staticmethod
+    def get_rsi(price_list, time_period):
+        count = len(price_list)-1
+        if count < 1 or count < time_period:
+            return [None] * (count+1)
+        else:
+            rsi_list = [None] * time_period
+            rsi_object = RSI.get_init_rsi(price_list[0:time_period+1])
+            rsi_list.append(rsi_object[-1])
+            previous_price = price_list[time_period]
+            rest_price_list = price_list[time_period+1:]
+            for price in rest_price_list:
+                rsi_object = RSI.get_new_rsi(time_period, price, previous_price, rsi_object)
+                previous_price = price
+                rsi_list.append(rsi_object[-1])
+            return rsi_list
+
+
+    # @staticmethod
+    # def get_rsi2(price_list, time_period):
+    #     rsi = talib.RSI(numpy.array(price_list), time_period)
+    #     # print rsi
+    #     return rsi
 
 
 class SAR(object):
     """
     psar Parabolic SAR(stop and reverse))
-    psar: (high_list, low_list, bull_p, ep, af, sar)
+    psar: (high_list, low_list, bull_p, af, sar)
     af: acceleration factor
     ep: extreme point
     iaf: increase affcleration facrtor
@@ -155,7 +165,7 @@ class SAR(object):
                     return new_high_list, new_low_list, bull_p, af, new_sar
 
     @staticmethod
-    def get_all_sar(high_pirce_list, low_price_list, bar_count=4, af0=0.02, iaf=0.02, max_af=0.2):
+    def get_initial_sar(high_pirce_list, low_price_list, bar_count=4, af0=0.02, iaf=0.02, max_af=0.2):
         psar_list = []
         psar = None
         for i in range(len(high_pirce_list)):
@@ -163,15 +173,23 @@ class SAR(object):
             low = low_price_list[i]
             psar = SAR.get_new_sar(high, low, psar, bar_count, af0, iaf, max_af)
             psar_list.append(psar)
-        return map(lambda x: x[-1], psar_list)
+        return psar_list
+
+    @staticmethod
+    def get_all_sar(high_pirce_list, low_price_list, bar_count=4, af0=0.02, iaf=0.02, max_af=0.2):
+        psar_list = SAR.get_initial_sar(high_pirce_list, low_price_list, bar_count, af0, iaf, max_af)
+        bull_sar = map(lambda x: [x[2], x[-1]], psar_list)
+        for i in range(bar_count-1):
+            bull_sar[i] = [None, None]
+        return bull_sar
 
 
 if __name__ == '__main__':
     # print MACD.get_all_macd([106.1, 26.59, 55.09, 56.1, 34.44, 45.29, 41.92])
     # print MACD.get_all_ema([106.1, 26.59, 55.09, 56.1, 34.44, 45.29, 41.92], 3)
     # talib.SAR(20, 2)
-    # print RSI.get_rsi([1, 3, 2.5, 2, 1.5])
-    # print RSI.get_rsi2([1, 3, 2.5, 2, 1.5])
+    print RSI.get_rsi([1, 3, 2.5, 2.1, 2, 1.5], 2)
+    # print RSI.get_rsi2([1, 3, 2.5, 2.1, 2, 1.5], 2)
     # psar = SAR.get_new_sar(31.1, 25.92)
     # print psar
     # psar = SAR.get_new_sar(34.21, 34.21, psar)
