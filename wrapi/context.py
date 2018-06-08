@@ -53,6 +53,9 @@ class Context(object):
     def now_tostring(self):
         return self.now().strftime('%Y-%m-%d %H:%M:%S')
 
+    def set_slippage(self, slippage):
+        self.api.slippage = slippage
+
 
 if __name__ == '__main__':
     # print Context().display_all()

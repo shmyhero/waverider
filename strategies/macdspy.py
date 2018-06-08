@@ -8,6 +8,7 @@ from utils.indicator import MACD
 
 
 def initialize(context):
+    context.set_slippage(0.0002)
     context.hold_long = False
     context.hold_short = False
     context.equity = symbol('SPY')
