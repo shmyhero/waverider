@@ -73,7 +73,7 @@ class WeekEndRule(DateRule):
 
     def validate(self, date):
         if TradeTime.is_trade_day(date):
-            week_end_date = DateRule.offset_days(date, -self.days_offset)
+            week_end_date = DateRule.offset_days(date, self.days_offset)
             return self.is_week_end_date(week_end_date)
         else:
             return False
@@ -124,7 +124,7 @@ class MonthEndRule(DateRule):
 
     def validate(self, date):
         if TradeTime.is_trade_day(date):
-            month_end_date = DateRule.offset_days(date, -self.days_offset)
+            month_end_date = DateRule.offset_days(date, self.days_offset)
             return MonthEndRule.is_month_end_date(month_end_date)
         else:
             return False
