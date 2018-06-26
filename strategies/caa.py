@@ -115,7 +115,12 @@ class CLA:
         self.l.append(None)
         self.g.append(None)
         self.f.append(f[:])
+        loop_count = 0
         while True:
+            loop_count += 1
+            if loop_count > 100:
+                log.exception('cannot find solution...')
+                raise Exception('cannot find solution...')
             # 1) case a): Bound one free weight
             l_in = None
             if len(f) > 1:
