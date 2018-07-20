@@ -82,16 +82,21 @@ class Logger:
 
 class DailyLoggerFactory(object):
 
-    _logger_dic = {}
-    _current_date = datetime.date.today()
+	# BUG: below codes has bug which would lead to no log in new created file...
+    # _logger_dic = {}
+    # _current_date = datetime.date.today()
+    #
+    # @staticmethod
+    # def get_logger(name, log_path, console=True):
+    #     key = "%s%s" % (name, log_path)
+    #     if key not in DailyLoggerFactory._logger_dic.keys() or DailyLoggerFactory._current_date != datetime.date.today():
+    #         logger = Logger(name, log_path, console)
+    #         DailyLoggerFactory._logger_dic[key] = logger
+    #         DailyLoggerFactory._current_date = datetime.date.today()
+    #         return logger
+    #     else:
+    #         return DailyLoggerFactory._logger_dic[key]
 
     @staticmethod
     def get_logger(name, log_path, console=True):
-        key = "%s%s" % (name, log_path)
-        if key not in DailyLoggerFactory._logger_dic.keys() or DailyLoggerFactory._current_date != datetime.date.today():
-            logger = Logger(name, log_path, console)
-            DailyLoggerFactory._logger_dic[key] = logger
-            DailyLoggerFactory._current_date = datetime.date.today()
-            return logger
-        else:
-            return DailyLoggerFactory._logger_dic[key]
+        return Logger(name, log_path, console)
