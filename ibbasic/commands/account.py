@@ -1,5 +1,6 @@
 from time import sleep
 from ib.opt import ibConnection, message
+from common.configmgr import ConfigMgr
 
 
 def my_account_handler(msg):
@@ -15,7 +16,8 @@ con = ibConnection()
 con.registerAll(my_account_handler)
 con.register(contract_handler, 'UpdatePortfolio')
 con.connect()
-con.reqAccountUpdates(1, '')
+con.reqAccountUpdates(1, ConfigMgr.get_ib_config()['account_code'])
+# con.reqAccountUpdates(1, '')
 
 sleep(5)
 con.disconnect()

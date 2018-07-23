@@ -16,8 +16,9 @@ class Context(object):
 
     def display_all(self):
         # positions = '\r\n'.join(self.portfolio.positions_amounts)
+        portfolio = self.portfolio
         positions = '\n\r'
-        for k, v in self.portfolio.positions_amounts:
+        for k, v in portfolio.positions_amounts:
             if len(k) > 15:
                 underlying = k[0:-15]
                 exp_date = datetime.datetime.strptime(k[-15:-9],'%y%m%d')
@@ -31,9 +32,9 @@ class Context(object):
                 symbol = k
             positions = positions + symbol + ':\t'+ str(v) + '\n\r'
 
-        content = ['portfolio value:%s' % self.portfolio.portfolio_value,
-                   'position value: %s' % self.portfolio.positions_value,
-                   'capital used: %s' % self.portfolio.capital_used,
+        content = ['portfolio value:%s' % portfolio.portfolio_value,
+                   'position value: %s' % portfolio.positions_value,
+                   'capital used: %s' % portfolio.capital_used,
                    'positions amounts: %s' % positions]
         return '\r\n'.join(content)
 
