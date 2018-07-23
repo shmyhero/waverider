@@ -46,6 +46,7 @@ def create_order(order_type, quantity, action, price = None):
     order.m_orderType = order_type
     order.m_totalQuantity = quantity
     order.m_action = action
+    order.m_account = ConfigMgr.get_ib_config()['account_code']
     if order_type == 'LMT':
         order.m_lmtPrice = price
     elif order_type == 'STP':
