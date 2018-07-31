@@ -84,12 +84,12 @@ class Data(object):
 
 if __name__ == '__main__':
     data = Data()
-    data.set_datetime(datetime.datetime(2018, 3, 5, 9, 31, 0))
+    # data.set_datetime(datetime.datetime(2018, 5, 29, 11, 31, 0))
     # print data.history('SPY', window=5)
 
     # NOT include current datetime.
     # print data.history(['SPY', 'QQQ'], window=5)
-    print data.history('SVXY', window=390, frequency='1m')
+    # print data.history('SVXY', window=390, frequency='1m')
     # print data.history(['SVXY', 'VIX'], window=60, frequency='1m')
     # print data.history(['SVXY', 'VIX'], window=1, frequency='1m')
     # print data.current('SVXY')
@@ -100,3 +100,13 @@ if __name__ == '__main__':
     # data.set_datetime(datetime.datetime(2018, 1, 5, 9, 31, 0))
     # print data.get_market_price('GLD')
     # print data.history('510050', frequency='30m', window=120)
+    data.set_datetime(datetime.datetime(2018, 3, 1, 11, 31, 0))
+    nx = ['SPY', 'QQQ']
+    df1 = data.history(nx, 'close', 30, '1d')
+    last_index = df1.index[-1]
+    data.set_datetime(datetime.datetime(2018, 4, 1, 11, 31, 0))
+    df2 = data.history(nx, 'close', 30, '1d')
+    df2 = df2[df2.index > last_index]
+    print df2
+    df = df1.append([df2])
+    print df[-1:]

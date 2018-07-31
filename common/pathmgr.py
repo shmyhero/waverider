@@ -53,4 +53,5 @@ class PathMgr(object):
         return os.path.join(project_path, 'strategies', 'portfolio', '%s.json' % strategy_name)
 
 
-
+if __name__ == '__main__':
+    print PathMgr.get_project_path()

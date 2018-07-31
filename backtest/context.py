@@ -47,7 +47,7 @@ class Context(object):
         # raise Exception("Terminated...")
 
     def now(self):
-        return datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
+        return self.api.data.specified_date_time
 
     def now_tostring(self):
         return self.now().strftime('%Y-%m-%d %H:%M:%S')
