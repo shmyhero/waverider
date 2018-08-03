@@ -3,16 +3,16 @@ import pandas as pd
 from utils.logger import DailyLoggerFactory
 from common.pathmgr import PathMgr
 from dataaccess.history import DBProvider, IBProvider
-from dataaccess.current import YahooScraper, MarketWatchScraper, IBCurrent
+from dataaccess.current import YahooScraper, MarketWatchScraper, CNBCScraper, IBCurrent
 
 
 class Data(object):
 
     def __init__(self):
         # self.historical_data_provider_lst = [IBProvider(), DBProvider()]
-        # self.current_data_provider_lst = [IBCurrent(), YahooScraper(), MarketWatchScraper()]
+        # self.current_data_provider_lst = [IBCurrent(), YahooScraper(), CNBCScraper(), MarketWatchScraper()]
         self.historical_data_provider_lst = [DBProvider(), IBProvider()]
-        self.current_data_provider_lst = [YahooScraper(), MarketWatchScraper(), IBCurrent()]
+        self.current_data_provider_lst = [YahooScraper(), MarketWatchScraper(), CNBCScraper(), IBCurrent()]
 
     def get_logger(self):
         return DailyLoggerFactory.get_logger(__name__, PathMgr.get_log_path())
@@ -113,11 +113,19 @@ if __name__ == '__main__':
     # print result[0]
     from pandas import Timestamp
 
-    xiv_prices = data.history('SVXY', "price", 1440, "1m").resample('30T',
-                                                                         closed='right',
-                                                                         label='right').last().dropna()
-    xiv_prices.index = [Timestamp(x, tz='US/Eastern') for x in xiv_prices.index]
-    xiv_prices.index = [Timestamp(x, tz='UTC') for x in xiv_prices.index]
+    # xiv_prices = data.history('SPY', "price", 1440, "1m").resample('30T',
+    #                                                                      closed='right',
+    #                                                                      label='right').last().dropna()
+
+    xiv_1m_prices = data.history('SVXY', "price", 1680, "1m")
+    # xiv_1m_prices.index = [Timestamp(x, tz='US/Eastern') for x in xiv_1m_prices.index]
+    # xiv_1m_prices.index = [Timestamp(x, tz='UTC') for x in xiv_1m_prices.index]
+    # Convert the integer timestamps in the index to a DatetimeIndex:
+    # xiv_1m_prices.index = pd.to_datetime(data.index, unit='s')
+    xiv_prices = xiv_1m_prices.resample('30T', closed='right', label='right').last().dropna()
+
+    # xiv_prices.index = [Timestamp(x, tz='US/Eastern') for x in xiv_prices.index]
+    # xiv_prices.index = [Timestamp(x, tz='UTC') for x in xiv_prices.index]
 
     print xiv_prices
     # print data.history('SPX')

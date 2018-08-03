@@ -72,6 +72,26 @@ class MarketWatchScraper(AbstractCurrentDataProvider):
             return None
 
 
+class CNBCScraper():
+
+    def __init__(self):
+        pass
+
+    def get_data_by_symbol(self, symbol):
+        url = 'https://www.cnbc.com/quotes/?symbol=%s' % symbol
+        content = HttpHelper.http_get(url)
+        value = string_fetch(content, '\"previous_day_closing\":\"', '\"')
+        return float(value.replace(',', ''))
+
+    def get_current_data(self, symbols):
+        try:
+            return map(self.get_data_by_symbol, symbols)
+        except Exception as e:
+            get_logger().error('Trace: ' + traceback.format_exc(), False)
+            get_logger().error('Error: get current price from CNBC failed:' + str(e))
+            return None
+
+
 class IBCurrent(AbstractCurrentDataProvider):
 
     def __init__(self):
@@ -95,4 +115,5 @@ if __name__ == '__main__':
     # print BarChartScraper().get_current_data(['XIV', 'SVXY'])
     # print MarketWatchScraper().get_current_data(['DJI', 'SPX'])
     # print MarketWatchScraper().get_current_data(['XIV'])
-    print IBCurrent().get_current_data(['SPY', 'SVXY'])
+    # print IBCurrent().get_current_data(['SPY', 'SVXY'])
+    print CNBCScraper().get_current_data(['QQQ', 'SVXY'])
