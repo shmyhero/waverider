@@ -72,7 +72,7 @@ class MarketWatchScraper(AbstractCurrentDataProvider):
             return None
 
 
-class CNBCScraper():
+class CNBCScraper(AbstractCurrentDataProvider):
 
     def __init__(self):
         pass
