@@ -1,4 +1,5 @@
 import traceback
+import time
 from abc import ABCMeta, abstractmethod
 from utils.httphelper import HttpHelper
 from utils.stringhelper import string_fetch
@@ -147,10 +148,17 @@ class IBCurrent(AbstractCurrentDataProvider):
 
     def get_data_by_symbol(self, symbol):
         price = self.api.get_market_price(symbol)
-        if price < 0:
-            raise Exception('The price is negative, price = %s'%price)
-        else:
-            return price
+        count = 0
+        for i in range(5):
+            if price < 0:
+                count += 1
+                if count <= 3:
+                    time.sleep(3)
+                    continue
+                else:
+                    raise Exception('The price is negative for 3 times, price = %s'%price)
+            else:
+                return price
 
     def get_current_data(self, symbols):
         try:
