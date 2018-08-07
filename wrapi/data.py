@@ -3,7 +3,7 @@ import pandas as pd
 from utils.logger import DailyLoggerFactory
 from common.pathmgr import PathMgr
 from dataaccess.history import DBProvider, IBProvider
-from dataaccess.current import YahooScraper, MarketWatchScraper, CNBCScraper, IBCurrent
+from dataaccess.current import YahooScraper, MarketWatchScraper, CNBCScraper, SINAScraper, LaoHu8Scraper, IBCurrent
 
 
 class Data(object):
@@ -12,7 +12,7 @@ class Data(object):
         # self.historical_data_provider_lst = [IBProvider(), DBProvider()]
         # self.current_data_provider_lst = [IBCurrent(), YahooScraper(), CNBCScraper(), MarketWatchScraper()]
         self.historical_data_provider_lst = [DBProvider(), IBProvider()]
-        self.current_data_provider_lst = [YahooScraper(), CNBCScraper(), IBCurrent()]
+        self.current_data_provider_lst = [SINAScraper(), YahooScraper(), LaoHu8Scraper(), IBCurrent()]
 
     def get_logger(self):
         return DailyLoggerFactory.get_logger(__name__, PathMgr.get_log_path())

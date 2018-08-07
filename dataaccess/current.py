@@ -92,13 +92,65 @@ class CNBCScraper(AbstractCurrentDataProvider):
             return None
 
 
+class SINAScraper(AbstractCurrentDataProvider):
+
+    def __init__(self):
+        pass
+
+    def get_data_by_symbols(self, symbols):
+        sina_symbols = ','.join(map(lambda x: 'gb_%s' % x.replace('.', '$').lower(), symbols))
+        url = 'http://hq.sinajs.cn/?list=%s'%sina_symbols
+        content = HttpHelper.http_get(url)
+        items = content.split(';')[:-1]
+        values = map(lambda x: float(string_fetch(x, ',', ',')), items)
+        return values
+
+    def get_data_by_symbol(self, symbol):
+        url = 'http://hq.sinajs.cn/?list=gb_%s' % symbol.replace('.', '$').lower()
+        content = HttpHelper.http_get(url)
+        value = string_fetch(content, ',', ',')
+        return float(value)
+
+    def get_current_data(self, symbols):
+        try:
+            return self.get_data_by_symbols(symbols)
+        except Exception as e:
+            get_logger().error('Trace: ' + traceback.format_exc(), False)
+            get_logger().error('Error: get current price from SINA failed:' + str(e))
+            return None
+
+
+class LaoHu8Scraper(AbstractCurrentDataProvider):
+
+    def __init__(self):
+        pass
+
+    def get_data_by_symbol(self, symbol):
+        url = 'https://www.laohu8.com/hq/s/%s' % symbol
+        content = HttpHelper.http_get(url)
+        value = string_fetch(content, 'class=\"price\">', '</td>')
+        return float(value)
+
+    def get_current_data(self, symbols):
+        try:
+            return map(self.get_data_by_symbol, symbols)
+        except Exception as e:
+            get_logger().error('Trace: ' + traceback.format_exc(), False)
+            get_logger().error('Error: get current price from LaoHu8 failed:' + str(e))
+            return None
+
+
 class IBCurrent(AbstractCurrentDataProvider):
 
     def __init__(self):
         self.api = API()
 
     def get_data_by_symbol(self, symbol):
-        return self.api.get_market_price(symbol)
+        price = self.api.get_market_price(symbol)
+        if price < 0:
+            raise Exception('The price is negative, price = %s'%price)
+        else:
+            return price
 
     def get_current_data(self, symbols):
         try:
@@ -116,4 +168,6 @@ if __name__ == '__main__':
     # print MarketWatchScraper().get_current_data(['DJI', 'SPX'])
     # print MarketWatchScraper().get_current_data(['XIV'])
     # print IBCurrent().get_current_data(['SPY', 'SVXY'])
-    print CNBCScraper().get_current_data(['QQQ', 'SVXY'])
+    # print CNBCScraper().get_current_data(['QQQ', 'SVXY'])
+    print SINAScraper().get_current_data(['QQQ', 'SVXY', 'LMT','MO','VHT','IHI','MA','V','ITA','CME','IEF','BIL'])
+    # print LaoHu8Scraper().get_current_data(['QQQ', 'SVXY'])
