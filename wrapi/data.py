@@ -12,7 +12,7 @@ class Data(object):
         # self.historical_data_provider_lst = [IBProvider(), DBProvider()]
         # self.current_data_provider_lst = [IBCurrent(), YahooScraper(), CNBCScraper(), MarketWatchScraper()]
         self.historical_data_provider_lst = [DBProvider(), IBProvider()]
-        self.current_data_provider_lst = [SINAScraper(), YahooScraper(), LaoHu8Scraper(), IBCurrent()]
+        self.current_data_provider_lst = [SINAScraper(), LaoHu8Scraper(), YahooScraper(), IBCurrent()]
 
     def get_logger(self):
         return DailyLoggerFactory.get_logger(__name__, PathMgr.get_log_path())
