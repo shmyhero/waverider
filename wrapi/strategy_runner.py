@@ -69,7 +69,7 @@ class StrategyRunner(object):
                             logger.error('Error: get action arguments failed:' + str(e))
                     else:
                         # logger.info('market not open...')
-                        pass
+                        Container.clear_loggers()
                 last_minute = now.minute
 
     @staticmethod

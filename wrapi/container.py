@@ -1,6 +1,6 @@
 import datetime
 import pytz
-from utils.logger import DailyLoggerFactory
+from utils.logger import DailyLoggerFactory, Logger
 from utils.timezonehelper import convert_to_us_east_dt
 from common.tradetime import TradeTime
 from common.pathmgr import PathMgr
@@ -44,6 +44,10 @@ class Container(object):
 
     _handle_data_dic = {}
 
+    # strategies_logger_dic should be clear after market close..
+    _strategies_logger_dic = {}
+
+
     @staticmethod
     def set_current_strategy(strategy_name):
         Container.current_strategy = strategy_name
@@ -81,7 +85,14 @@ class Container(object):
 
     @staticmethod
     def get_logger(strategy_name):
-        return DailyLoggerFactory.get_logger(strategy_name, PathMgr.get_log_path(strategy_name))
+        if strategy_name not in Container._strategies_logger_dic.keys():
+            logger = Logger(strategy_name, PathMgr.get_log_path(strategy_name), True)
+            Container._strategies_logger_dic[strategy_name] = logger
+        return Container._strategies_logger_dic[strategy_name]
+
+    @staticmethod
+    def clear_loggers():
+        Container._strategies_logger_dic = {}
 
     @staticmethod
     def schedule_function(func, date_rule, time_rule, half_days=True):
