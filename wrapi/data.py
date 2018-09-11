@@ -68,7 +68,7 @@ class Data(object):
                 else:
                     map(lambda x, y: x.append(y[1]), results, rows)
             if len(results) > window:
-                results = results[:window]
+                results = results[-window:]
             df = pd.DataFrame(map(lambda x: x[1:], results), index=map(lambda x: x[0], results), columns=columns[1:])
             return df
         else:
