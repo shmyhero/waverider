@@ -34,7 +34,7 @@ class Data(object):
                 else:
                     map(lambda x, y: x.append(y[1]), results, rows)
             if len(results) > window:
-                results = results[:window]
+                results = results[-window:]
             df = pd.DataFrame(map(lambda x: x[1:], results), index=map(lambda x: x[0], results), columns=columns[1:])
             return df
         else:
@@ -46,7 +46,7 @@ class Data(object):
             elif frequency == '30m':
                 rows = self.provider.history_30_min(symbol, window, self.specified_date_time)
             if len(rows) > window:
-                rows = rows[:window]
+                rows = rows[-window:]
             series = pd.Series(map(lambda x: x[1], rows), index=map(lambda x: x[0], rows))
             return series
 
