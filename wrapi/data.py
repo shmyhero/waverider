@@ -80,7 +80,7 @@ class Data(object):
             elif frequency == '30m':
                 rows = self._get_history_30min(symbol, window)
             if len(rows) > window:
-                rows = rows[:window]
+                rows = rows[-window:]
             series = pd.Series(map(lambda x: x[1], rows), index=map(lambda x: x[0], rows))
             return series
 
