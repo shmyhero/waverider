@@ -1,8 +1,11 @@
 import datetime
 import pytz
+import json
 from abc import ABCMeta, abstractmethod
 from utils.logger import Logger, DailyLoggerFactory
+from utils.httphelper import HttpHelper
 from common.pathmgr import PathMgr
+from common.configmgr import ConfigMgr
 from dataaccess.symbols import Symbols
 from dataaccess.db import YahooEquityDAO
 from common.tradetime import TradeTime
@@ -54,6 +57,7 @@ class DBProvider(AbstractHistoricalDataProvider):
 
     def history_30_min(self, symbol, window):
         return YahooEquityDAO().get_latest_equity_30_min_prices(symbol, window)
+
 
 class BackTestDBProvider(AbstractHistoricalDataProvider):
 
@@ -110,4 +114,45 @@ class IBProvider(AbstractHistoricalDataProvider):
         return results
 
 
+class BarChartProvider(AbstractHistoricalDataProvider):
 
+    def __init__(self):
+        self.api_key = ConfigMgr.get_others_config()['barchart_api_key']
+
+    def history(self, symbol, field, window):
+        from_date = TradeTime.get_from_date_by_window(window)
+        url_template = 'http://ondemand.websol.barchart.com/getHistory.json?apikey={}&symbol={}.BZ&type=daily&startDate={}000000'
+        url = url_template.format(self.api_key, symbol, from_date.strftime('%Y%m%d'))
+        fields_dic = {'open': 'open', 'close': 'close', 'high': 'high', 'low': 'low',
+                      'price': 'close', 'unadj': 'close'}
+        fields = fields_dic.keys()
+        if field.lower() not in field:
+            raise Exception('the field should be in %s...'%fields)
+        price_field = fields_dic[field]
+        content = HttpHelper.http_get(url)
+        data = json.loads(content)
+        if data['status']['code'] != 200:
+            raise Exception('http response unexcepted, the the content is: %s'%content)
+        else:
+            rows = map(lambda x: [datetime.datetime.strptime(x['tradingDay'], '%Y-%m-%d'), x[price_field]], data['results'])
+            return rows
+
+    def history_min(self, symbol, window):
+        url_template = 'http://ondemand.websol.barchart.com/getHistory.json?apikey={}&symbol={}.BZ&type=formTMinutes&startDate={}00'
+        days_window = window / 391 + 2
+        from_date = TradeTime.get_from_date_by_window(days_window)
+        start_time = datetime.datetime(from_date.year, from_date.month, from_date.day, 0, 0)
+        url = url_template.format(self.api_key, symbol, start_time.strftime('%Y%m%d%M%S'))
+        content = HttpHelper.http_get(url)
+        data = json.loads(content)
+        if data['status']['code'] != 200:
+            raise Exception('http response unexcepted, the the content is: %s' % content)
+        else:
+            rows = map(lambda x: [datetime.datetime.strptime(x['timestamp'][:-6], '%Y-%m-%dT%H:%M:%S'), x['close']], data['results'])
+            rows = filter(lambda x: TradeTime.is_valid_trade_time(x[0]), rows)
+            rows.sort(key=lambda x: x[0])
+            return rows[-window:]
+
+
+if __name__ == '__main__':
+    print BarChartProvider().history_min('SPY', 391)

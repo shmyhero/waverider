@@ -43,12 +43,13 @@ if __name__ == '__main__':
     # print data.current(['SPY', 'QQQ'])
     # StrategyRunner.run('caa')
     # n9 = ['LMT', 'MO', 'QQQ', 'DIA', 'EFA', 'EEM', 'HYG', 'IEF', 'BIL']
-    # n9 = ['HYG', 'IEF', 'BIL']
+    # # n9 = ['HYG', 'IEF', 'BIL']
     # df = data.history(n9, 'close', 260, '1d')
     # print df[10:50]
     # print data.history('SPY', 'open', 1)[0]
     # print data.current('SPY')
-    # s = data.history('SPY', field='close', window=5)
+    # s = data.history('SPY', field='close', window=10)
+    # print s
     # print data.history('SPY', "price", 391, "1m")
     # print data.current('QQQ')
     # print s
@@ -58,21 +59,28 @@ if __name__ == '__main__':
 
 
 
-    s = data.history('SPY', field='high', window=120)
-    indexes = s.index
-    high_list = s.tolist()
-    low_list = data.history('SPY', field='low', window=120).tolist()
-    # print high_list, low_list
-    from utils.indicator import SAR
-    sar_list = SAR.get_all_sar(high_list, low_list)
-    for i in range(len(indexes)):
-        print indexes[i], sar_list[i]
+    # s = data.history('SPY', field='high', window=120)
+    # indexes = s.index
+    # high_list = s.tolist()
+    # low_list = data.history('SPY', field='low', window=120).tolist()
+    # # print high_list, low_list
+    # from utils.indicator import RSI, SAR
+    # sar_list = SAR.get_all_sar(high_list, low_list)
+    # for i in range(len(indexes)):
+    #     print indexes[i], sar_list[i]
+    #
+    # close_list = data.history('SPY', window=120).tolist()
+    # print RSI.get_rsi(close_list, 2)
 
     # from utils.indicator import RSI
     # print RSI.get_rsi(price_list)
     # print RSI.get_rsi2(price_list)
 
-    # print data.history('SVXY', window=950, frequency='1m')
+    # print data.history('SVXY', window=391, frequency='1m')
+
+    # print data.history(['ADBE', 'AVGO', 'AMZN', 'NFLX', 'GOOG'], window=2000)
+    # print data.history('SPY', window = 391, frequency='1m')
+    print data.history(['QQQ', 'IWM'], 'price', 10, '1d')
 
 
 

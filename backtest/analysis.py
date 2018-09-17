@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from data import Data
 import ffn
 
+
 class Analysis(object):
 
     def __init__(self, strategy_name, data):

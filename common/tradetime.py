@@ -115,6 +115,21 @@ class TradeTime(object):
             return False
 
     @staticmethod
+    def is_valid_trade_time(specified_time):
+        if TradeTime.is_trade_day(specified_time.date()):
+            if TradeTime.is_half_trade_day(specified_time.date()):
+                end_hour = 13
+            else:
+                end_hour = 16
+            minutes = specified_time.hour * 60 + specified_time.minute
+            if 9 * 60 + 30 < minutes <= end_hour * 60:
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    @staticmethod
     def get_latest_trade_date():
         for i in range(10):
             trade_date = datetime.datetime.today() - datetime.timedelta(days=i+1)
